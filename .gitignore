@@ -1,0 +1,12 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# Build folders
+Debug/
+Release/
+
+# User-specific
+*.user
+*.suo
