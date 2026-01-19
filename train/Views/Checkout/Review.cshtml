@@ -1,0 +1,66 @@
+﻿@model train.ViewModels.CartIndexViewModel
+@{
+    ViewData["Title"] = "Review your order";
+}
+<h2>Review your order</h2>
+<hr />
+
+@if (TempData["Error"] is string e && !string.IsNullOrEmpty(e))
+{
+    <div class="alert alert-danger">@e</div>
+}
+@if (TempData["Ok"] is string ok && !string.IsNullOrEmpty(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info">Your cart is empty.</div>
+    <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Continue shopping</a>
+}
+else
+{
+    @* reuse the cart table layout, but without remove/clear for brevity *@
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="text-end">Unit</th>
+                    <th>Qty</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <div class="fw-bold">@i.Name</div>
+                            <div class="text-muted small">@i.Category @if (!string.IsNullOrWhiteSpace(i.Color))
+                                {
+                                    <span>· @i.Color</span>
+                                }</div>
+                        </td>
+                        <td class="text-end">@i.UnitPrice.ToString("C")</td>
+                        <td>@i.Quantity</td>
+                        <td class="text-end">@i.LineTotal.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2">Items: @Model.TotalQuantity</th>
+                    <th class="text-end">Subtotal:</th>
+                    <th class="text-end">@Model.Subtotal.ToString("C")</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <form asp-action="Place" method="post">
+        <button class="btn btn-primary">Confirm & Place Order</button>
+        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">Edit Cart</a>
+    </form>
+}

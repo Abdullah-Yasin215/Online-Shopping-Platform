@@ -1,0 +1,65 @@
+﻿@model train.Models.Order
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<h2>Order #@Model.Id</h2>
+<div class="text-muted mb-3">
+    Placed @Model.OrderDate.ToString("yyyy-MM-dd HH:mm") · Status: @Model.Status
+</div>
+<hr />
+
+<!-- 🧩 Contact Block Integration -->
+<div class="border rounded p-3 mb-3">
+    <div><strong>Customer:</strong> @((Model.User?.UserName) ?? Model.ContactName ?? "Guest")</div>
+    <div><strong>Email:</strong> @((Model.User?.Email) ?? Model.ContactEmail ?? "—")</div>
+    <div><strong>Phone:</strong> @(Model.ContactPhone ?? "—")</div>
+    <div><strong>City:</strong> @(Model.City ?? "—")</div>
+    <div><strong>Postal Code:</strong> @(Model.PostalCode ?? "—")</div>
+    @if (!string.IsNullOrWhiteSpace(Model.ShippingAddress))
+    {
+        <div><strong>Address:</strong> @Model.ShippingAddress</div>
+    }
+</div>
+<!-- ✅ End Contact Block -->
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Details</th>
+                <th class="text-end">Unit</th>
+                <th>Qty</th>
+                <th class="text-end">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.Items)
+            {
+                <tr>
+                    <td class="fw-semibold">@i.ProductName</td>
+                    <td class="text-muted small">
+                        @i.CategoryName
+                        @if (!string.IsNullOrWhiteSpace(i.Color))
+                        {
+                            <span>· @i.Color</span>
+                        }
+                    </td>
+                    <td class="text-end">@i.UnitPrice.ToString("C")</td>
+                    <td>@i.Quantity</td>
+                    <td class="text-end">@i.LineTotal.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3"></th>
+                <th class="text-end">Total:</th>
+                <th class="text-end">@Model.TotalAmount.ToString("C")</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Continue shopping</a>

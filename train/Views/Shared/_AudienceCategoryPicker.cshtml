@@ -1,0 +1,58 @@
+﻿@model train.ViewModels.ProductFormViewModel
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <label asp-for="TargetAudience" class="form-label">Audience</label>
+    <select asp-for="TargetAudience" class="form-select" id="audSel">
+      <option>Men</option>
+      <option>Women</option>
+      <option>Boys</option>
+      <option>Girls</option>
+    </select>
+    <span asp-validation-for="TargetAudience" class="text-danger"></span>
+  </div>
+
+  <div class="col-md-6">
+    <label asp-for="CategoryId" class="form-label">Category</label>
+    <select asp-for="CategoryId" class="form-select" id="catSel">
+      <option value="">-- choose --</option>
+      @if (Model.Categories != null)
+      {
+        foreach (var c in Model.Categories)
+        {
+          <option value="@c.Value" selected="@(c.Selected ? "selected" : null)">@c.Text</option>
+        }
+      }
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger"></span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    async function loadCats(aud, selectedId) {
+      try {
+        const res = await fetch(`/admin/categories/for-audience?audience=${encodeURIComponent(aud)}`);
+        if (!res.ok) return;
+        const data = await res.json(); // [{id,name}]
+        const sel = document.getElementById('catSel');
+        sel.innerHTML = '<option value="">-- choose --</option>';
+        for (const x of data) {
+          const opt = document.createElement('option');
+          opt.value = x.id;
+          opt.textContent = x.name;
+          if (selectedId !== null && selectedId !== '' && Number(selectedId) === Number(x.id)) opt.selected = true;
+          sel.appendChild(opt);
+        }
+      } catch { /* ignore */ }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const audSel = document.getElementById('audSel');
+      const initialAudience = audSel?.value ?? 'Men';
+      const initialCategoryId = '@(Model.CategoryId?.ToString() ?? "")';
+      loadCats(initialAudience, initialCategoryId);
+      audSel?.addEventListener('change', e => loadCats(e.target.value, null));
+    });
+  })();
+</script>
+

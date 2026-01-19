@@ -1,0 +1,38 @@
+@model train.ViewModels.CatalogIndexViewModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        @* Filter Toggle *@
+        <button class="btn btn-outline-dark d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
+            <i class="bi bi-sliders"></i> Filters
+        </button>
+
+        @* Count display *@
+        <span class="text-muted">
+            <span class="fw-bold text-dark">@Model.TotalCount</span> products
+        </span>
+    </div>
+
+    @* Sort Dropdown *@
+    <div class="d-flex align-items-center gap-2">
+        <label for="sortSelect" class="form-label mb-0 text-muted d-none d-md-block">Sort by:</label>
+        <select id="sortSelect" class="form-select form-select-sm" style="width: auto; border-color: #dee2e6;" onchange="updateSort(this.value)">
+            @{
+                var option0 = Model.Sort == 0 ? "<option value=\"0\" selected>Newest</option>" : "<option value=\"0\">Newest</option>";
+                var option1 = Model.Sort == 1 ? "<option value=\"1\" selected>Price: Low to High</option>" : "<option value=\"1\">Price: Low to High</option>";
+                var option2 = Model.Sort == 2 ? "<option value=\"2\" selected>Price: High to Low</option>" : "<option value=\"2\">Price: High to Low</option>";
+            }
+            @Html.Raw(option0)
+            @Html.Raw(option1)
+            @Html.Raw(option2)
+        </select>
+    </div>
+</div>
+
+<script>
+    function updateSort(value) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', value);
+        window.location.search = urlParams.toString();
+    }
+</script>

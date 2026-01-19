@@ -1,0 +1,164 @@
+﻿@model train.Models.Product
+@using train.Helpers
+@{
+    // build details URL once
+    var detailsUrl = Url.Action("Details", "Catalog", new { id = Model.Id })!;
+    var sizes = !string.IsNullOrEmpty(Model.Sizes) ? Model.Sizes.Split(',').Select(s => s.Trim()).ToArray() :
+    Array.Empty<string>();
+    var colors = !string.IsNullOrEmpty(Model.Colors) ? Model.Colors.Split(',').Select(c => c.Trim()).ToArray() :
+    Array.Empty<string>();
+}
+<div class="card product-card h-100 card-lift animate-on-scroll"
+    style="border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+    <div class="img-zoom-container position-relative">
+        <a href="@detailsUrl" class="text-decoration-none">
+            <img src="@(Model.ImageUrl ?? "/img/placeholder.png")" alt="@Model.Name" class="card-img-top img-zoom"
+                loading="lazy" style="object-fit: cover; height: 280px;" />
+        </a>
+
+        <!-- Quick View Badge (appears on hover) -->
+        <div class="product-quick-actions position-absolute top-0 end-0 p-2"
+            style="opacity: 0; transition: opacity var(--transition-base);">
+            <a href="@detailsUrl" class="btn btn-sm btn-light rounded-circle" title="Quick View">
+                <i class="bi bi-eye"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body d-flex flex-column p-3">
+        <a href="@detailsUrl" class="text-decoration-none text-dark hover-underline">
+            <h6 class="card-title mb-2">@Model.Name</h6>
+        </a>
+        <div class="text-muted small mb-3" style="font-size: 0.85rem;">
+            @Model.Category?.Name
+            @if (!string.IsNullOrWhiteSpace(Model.Category?.Color))
+            {
+                <span>· @Model.Category!.Color</span>
+            }
+        </div>
+
+        @* Show available sizes *@
+        @if (sizes.Any())
+        {
+            <div class="mb-2">
+                <small class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Sizes:</small>
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                    @foreach (var size in sizes)
+                    {
+                        <span class="badge bg-light text-dark border">@size</span>
+                    }
+                </div>
+            </div>
+        }
+
+        @* Show available colors *@
+        @if (colors.Any())
+        {
+            <div class="mb-3">
+                <small class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Colors:</small>
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                    @foreach (var color in colors)
+                    {
+                        <span class="badge bg-secondary text-white">@color</span>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="mt-auto">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="price fw-bold">@Model.Price.FormatPKR()</span>
+                @if (Model.Stock < 10)
+                {
+                    <small class="badge bg-danger">Only @Model.Stock left!</small>
+                }
+            </div>
+
+            @if (sizes.Any())
+            {
+                @* Button to open size selection modal *@
+                <button class="btn btn-primary w-100 btn-ripple btn-hover-lift" type="button" data-bs-toggle="modal"
+                    data-bs-target="#sizeModal_@Model.Id" style="border-radius: var(--radius-md); font-weight: 500; padding: 0.6rem;">
+                    <i class="bi bi-bag-plus me-1"></i> Add to Cart
+                </button>
+            }
+            else
+            {
+                @* Direct add to cart if no sizes *@
+                <form asp-controller="Cart" asp-action="Add" method="post" class="add-to-cart-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="hidden" name="qty" value="1" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                    <button class="btn btn-primary w-100 btn-ripple btn-hover-lift" type="submit"
+                        style="border-radius: var(--radius-md); font-weight: 500; padding: 0.6rem;">
+                        <i class="bi bi-bag-plus me-1"></i> Add to Cart
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@* Size Selection Modal *@
+@if (sizes.Any())
+{
+    <div class="modal fade" id="sizeModal_@Model.Id" tabindex="-1" aria-labelledby="sizeModalLabel_@Model.Id"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sizeModalLabel_@Model.Id">Select Size - @Model.Name</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Cart" asp-action="Add" method="post" class="add-to-cart-form">
+                    <div class="modal-body">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="qty" value="1" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Size <span class="text-danger">*</span></label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var size in sizes)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="selectedSize"
+                                            id="size_@(Model.Id)_@size" value="@size" required>
+                                        <label class="form-check-label btn btn-outline-secondary" for="size_@(Model.Id)_@size"
+                                            style="cursor: pointer; padding: 0.375rem 0.75rem;">
+                                            @size
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        @if (colors.Any() && colors.Length > 1)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Color (Optional)</label>
+                                <select name="selectedColor" class="form-select">
+                                    <option value="">Any Color</option>
+                                    @foreach (var color in colors)
+                                    {
+                                        <option value="@color">@color</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+
+                        <div class="alert alert-info">
+                            <strong>Price:</strong> @Model.Price.FormatPKR()
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,170 @@
+﻿@model PaymentInfoVm
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Complete Your Payment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <input type="hidden" asp-for="OrderId" />
+                        <input type="hidden" asp-for="OrderTotal" />
+
+                        <div class="mb-3">
+                            <label asp-for="PaymentMethod" class="form-label">Payment Method *</label>
+                            <select asp-for="PaymentMethod" class="form-control" id="paymentMethod">
+                                <option value="COD">Cash on Delivery (COD)</option>
+                                <option value="Card">Credit/Debit Card</option>
+                                <option value="Wallet">Mobile Wallet</option>
+                                <option value="BankTransfer">Bank Transfer</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+
+                        <!-- Card Payment Section -->
+                        <div id="cardSection" class="payment-section" style="display: none;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label asp-for="CardHolderName" class="form-label">Card Holder Name</label>
+                                        <input asp-for="CardHolderName" class="form-control" />
+                                        <span asp-validation-for="CardHolderName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label asp-for="CardNumber" class="form-label">Card Number</label>
+                                        <input asp-for="CardNumber" class="form-control" placeholder="4242 4242 4242 4242" />
+                                        <span asp-validation-for="CardNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="ExpiryMonth" class="form-label">Expiry Month</label>
+                                        <select asp-for="ExpiryMonth" class="form-control">
+                                            <option value="">Month</option>
+                                            @for (int i = 1; i <= 12; i++)
+                                            {
+                                                <option value="@i">@i.ToString("00")</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="ExpiryMonth" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="ExpiryYear" class="form-label">Expiry Year</label>
+                                        <select asp-for="ExpiryYear" class="form-control">
+                                            <option value="">Year</option>
+                                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="ExpiryYear" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="CVV" class="form-label">CVV</label>
+                                        <input asp-for="CVV" class="form-control" placeholder="123" />
+                                        <span asp-validation-for="CVV" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wallet Section -->
+                        <div id="walletSection" class="payment-section" style="display: none;">
+                            <div class="mb-3">
+                                <label asp-for="WalletProvider" class="form-label">Wallet Provider</label>
+                                <select asp-for="WalletProvider" class="form-control">
+                                    <option value="">Select Provider</option>
+                                    <option value="Easypaisa">Easypaisa</option>
+                                    <option value="JazzCash">JazzCash</option>
+                                    <option value="PayPal">PayPal</option>
+                                </select>
+                                <span asp-validation-for="WalletProvider" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="WalletAccount" class="form-label">Account Number</label>
+                                <input asp-for="WalletAccount" class="form-control" />
+                                <span asp-validation-for="WalletAccount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Section -->
+                        <div id="bankSection" class="payment-section" style="display: none;">
+                            <div class="alert alert-info">
+                                <h6>Bank Transfer Instructions</h6>
+                                <p>Please transfer the amount to our bank account and include the order number as reference.</p>
+                                <p>
+                                    <strong>Account Name:</strong> Your Store<br>
+                                    <strong>Account Number:</strong> 123456789<br>
+                                    <strong>Bank:</strong> Example Bank
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="BankReference" class="form-label">Transfer Reference</label>
+                                <input asp-for="BankReference" class="form-control" placeholder="Order #@Model.OrderId" />
+                                <span asp-validation-for="BankReference" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Complete Payment</button>
+                            <a href="@Url.Action("Details", "MyOrders", new { id = Model.OrderId })" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Order #:</strong> @Model.OrderId</p>
+                    <p><strong>Amount to Pay:</strong> $@Model.OrderTotal.ToString("N2")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethod = document.getElementById('paymentMethod');
+            const sections = document.querySelectorAll('.payment-section');
+
+            function updateSections() {
+                // Hide all sections
+                sections.forEach(section => section.style.display = 'none');
+
+                // Show relevant section
+                const method = paymentMethod.value;
+                if (method === 'Card') {
+                    document.getElementById('cardSection').style.display = 'block';
+                } else if (method === 'Wallet') {
+                    document.getElementById('walletSection').style.display = 'block';
+                } else if (method === 'BankTransfer') {
+                    document.getElementById('bankSection').style.display = 'block';
+                }
+            }
+
+            paymentMethod.addEventListener('change', updateSections);
+            updateSections(); // Initial call
+        });
+    </script>
+}

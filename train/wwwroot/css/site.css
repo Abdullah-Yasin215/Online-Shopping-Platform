@@ -1,0 +1,1086 @@
+/* ===== Blue + White theme ===== */
+:root {
+    --brand: #0d6efd; /* Bootstrap primary */
+    --ink: #0b1320; /* dark ink */
+    --ink-weak: #5c6672;
+    --surface: #ffffff;
+    --surface-subtle: #f6f8fc;
+}
+body {
+    padding-top: 0px;
+}
+/* smaller top gap */
+@media (min-width: 992px) {
+    body {
+        padding-top: 56px;
+    }
+}
+
+
+/* Top navbar look */
+.navbar.navbar-shop {
+    background: var(--surface);
+    border-bottom: 1px solid rgba(13,110,253,.08);
+}
+
+.navbar-shop .navbar-brand {
+    color: var(--ink);
+    letter-spacing: .04em;
+}
+
+.navbar-shop .nav-link {
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    font-size: .95rem;
+    padding: .75rem 1rem;
+}
+
+/* Underline indicator */
+.navbar-shop .nav-link {
+    position: relative;
+}
+
+    .navbar-shop .nav-link::after {
+        content: "";
+        position: absolute;
+        left: .75rem;
+        right: .75rem;
+        bottom: .25rem;
+        height: 2px;
+        background: var(--brand);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform .18s ease-out;
+    }
+
+    .navbar-shop .nav-item.mega-hover:hover > .nav-link::after,
+    .navbar-shop .nav-link:hover::after {
+        transform: scaleX(1);
+    }
+
+/* Hover feedback */
+.btn, .nav-link {
+    transition: all .2s ease-in-out;
+}
+
+    .btn-outline-primary:hover,
+    .nav-link:hover {
+        color: var(--brand) !important;
+        background-color: rgba(13,110,253,.08) !important;
+        transform: translateY(-1px);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 6px 12px rgba(0,0,0,.15);
+    }
+
+/* ===== Mega menu panel ===== */
+.navbar-shop .dropdown-menu.megamenu {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    box-shadow: 0 12px 28px rgba(13,110,253,.12), 0 2px 8px rgba(13,110,253,.06);
+}
+
+.megagrid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 1.25rem 2rem;
+}
+
+@media (max-width: 991.98px) {
+    .megagrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.megamenu h6 {
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-weak);
+    margin: .25rem 0 .75rem;
+}
+
+.megamenu .mega-item {
+    display: block;
+    padding: .2rem 0;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+    .megamenu .mega-item:hover {
+        color: var(--brand);
+    }
+
+/* Right-side deal card */
+.megadeal {
+    background: var(--surface-subtle);
+    border-radius: .75rem;
+    padding: 1rem 1.25rem;
+}
+
+/* Hover-open on desktop (no JS) */
+@media (min-width: 992px) {
+    .nav-item.mega-hover {
+        position: static;
+    }
+
+        .nav-item.mega-hover > .dropdown-menu {
+            display: block;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all .15s ease;
+        }
+
+        .nav-item.mega-hover:hover > .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+}
+
+/* Dark theme support (optional) */
+[data-bs-theme="dark"] .navbar {
+    --bs-navbar-color: rgba(255,255,255,.85);
+    --bs-navbar-hover-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-toggler-border-color: rgba(255,255,255,.25);
+}
+
+    [data-bs-theme="dark"] .navbar .dropdown-menu.megamenu {
+        background-color: #1f2327;
+        box-shadow: 0 12px 28px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
+    }
+
+[data-bs-theme="dark"] .megamenu .mega-item {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .megamenu h6 {
+    color: #adb5bd;
+}
+
+/* Top sellers product cards */
+.product-card {
+    transition: transform .2s ease, box-shadow .2s ease;
+    border: 1px solid rgba(13,110,253,.08);
+}
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+
+/* Category tiles */
+.cat-tile {
+    border: 1px solid rgba(0,0,0,.06);
+    background: #fff;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+    .cat-tile:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(13,110,253,.08);
+        border-color: rgba(13,110,253,.25);
+    }
+
+.cat-tile-img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.05));
+}
+
+/* Category tabs row */
+.mega-tabs .nav-link {
+    border-radius: 0;
+    padding: .85rem 1.25rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: #0b1320;
+}
+
+    .mega-tabs .nav-link.active,
+    .mega-tabs .nav-link:hover {
+        color: #0d6efd;
+        background: rgba(13,110,253,.08);
+    }
+
+/* Panels under the tabs */
+.mega-panels {
+    display: none; /* off by default */
+    position: relative; /* keep within flow; sits below tabs */
+    background: #fff;
+    border-top: 1px solid rgba(0,0,0,.06);
+}
+
+/* Show when any tab is active/focused */
+.mega-tabs .nav-link.active ~ .mega-panels {
+    display: block;
+}
+
+/* Because of markup order, we reveal from JS below (safer): */
+.mega-panels.show {
+    display: block;
+}
+
+.mega-link {
+    display: block;
+    padding: .375rem 0;
+    color: #0b1320;
+    text-decoration: none;
+}
+
+    .mega-link:hover {
+        color: #0d6efd;
+    }
+
+/* Product card helpers */
+.product-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4 / 5; /* keeps a nice, non-jumpy image box */
+}
+
+.product-card .price {
+    font-weight: 600;
+}
+
+.product-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+}
+
+/* Ensure space for footer and tidy product cards */
+main {
+    padding-bottom: 3rem;
+}
+/* belt-and-suspenders */
+footer.footer {
+    position: static !important;
+}
+/* in case it was fixed elsewhere */
+
+.product-card img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+}
+<style >
+/* ===== Black & White Admin Theme (no logic changes) ===== */
+.bw-admin {
+    background: #fff;
+    color: #111;
+    font-size: 14px
+}
+
+.bw-sidebar {
+    width: 240px;
+    background: #0f0f10;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    height: 100vh
+}
+
+.bw-brand {
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 20px;
+    border-bottom: 1px solid #1e1e20
+}
+
+.bw-nav {
+    padding: 8px
+}
+
+.bw-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #cfcfd2;
+    text-decoration: none
+}
+
+    .bw-nav-item:hover {
+        background: #1a1a1c;
+        color: #fff
+    }
+
+    .bw-nav-item.active {
+        background: #fff;
+        color: #000
+    }
+
+.bw-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cfcfd2;
+    display: inline-block
+}
+
+.bw-main {
+    padding: 24px 28px 40px
+}
+
+.bw-topbar {
+    border: 1px solid #e7e7ea;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    background: #fff
+}
+
+.bw-title {
+    font-weight: 700
+}
+
+.bw-search {
+    min-width: 260px
+}
+
+.bw-kv {
+    display: flex;
+    gap: 6px;
+    align-items: center
+}
+
+.bw-k {
+    color: #666;
+    font-size: 12px
+}
+
+.bw-v {
+    font-weight: 600
+}
+
+.bw-grid {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 14px;
+    margin-bottom: 18px
+}
+
+.bw-card {
+    border: 1px solid #e7e7ea;
+    border-radius: 16px;
+    background: #fff
+}
+
+    .bw-card .bw-kpi-label {
+        color: #6c6c70;
+        font-size: 12px;
+        padding: 14px 16px 4px
+    }
+
+    .bw-card .bw-kpi-value {
+        font-size: 32px;
+        font-weight: 800;
+        padding: 0 16px 10px
+    }
+
+    .bw-card .bw-link {
+        display: inline-block;
+        color: #111;
+        text-decoration: none;
+        border: 1px solid #111;
+        border-radius: 999px;
+        padding: 6px 10px;
+        margin: 0 16px 16px;
+        font-size: 12px
+    }
+
+        .bw-card .bw-link:hover {
+            background: #111;
+            color: #fff
+        }
+
+.bw-actions {
+    display: grid;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 10px;
+    margin-bottom: 18px
+}
+
+.bw-btn {
+    display: inline-block;
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid #111
+}
+
+    .bw-btn:hover {
+        opacity: .9
+    }
+
+.bw-btn-outline {
+    background: #fff;
+    color: #111
+}
+
+.bw-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px
+}
+
+.bw-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px dashed #e7e7ea
+}
+
+.bw-card-title {
+    font-weight: 700
+}
+
+.bw-chart {
+    padding-bottom: 8px
+}
+
+.bw-spark {
+    width: 100%;
+    height: 140px
+}
+
+    .bw-spark path {
+        stroke: #111;
+        stroke-width: 2;
+        fill: none
+    }
+
+.bw-list {
+    padding: 10px 14px
+}
+
+.bw-alert {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    border: 1px solid #111;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px
+}
+
+.bw-badge {
+    display: inline-block;
+    border: 1px solid #111;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 12px
+}
+
+.bw-thead th {
+    font-weight: 600;
+    border-bottom: 1px solid #111
+}
+
+.table > :not(caption) > * > * {
+    background: transparent
+}
+
+@media (max-width: 1200px) {
+    .bw-grid {
+        grid-template-columns: repeat(2,1fr)
+    }
+
+    .bw-row {
+        grid-template-columns: 1fr
+    }
+}
+
+@media (max-width: 768px) {
+    .bw-admin {
+        display: block
+    }
+
+    .bw-sidebar {
+        position: relative;
+        height: auto;
+        width: 100%
+    }
+
+    .bw-main {
+        padding: 16px
+    }
+
+    .bw-actions {
+        grid-template-columns: 1fr 1fr
+    }
+}
+
+/* ==== Black & White Footer ==== */
+:root {
+    --bw-bg: #ffffff;
+    --bw-fg: #0f0f10;
+    --bw-muted: #6c6c70;
+    --bw-line: #e7e7ea;
+    --bw-inv: #0f0f10;
+    --bw-inv-fg: #ffffff;
+}
+
+.bw-footer {
+    background: var(--bw-bg);
+    color: var(--bw-fg);
+    border-top: 1px solid var(--bw-line);
+}
+
+.bw-links li + li {
+    margin-top: .25rem;
+}
+
+.bw-links a {
+    color: var(--bw-fg);
+    text-decoration: none;
+}
+
+    .bw-links a:hover {
+        text-decoration: underline;
+    }
+
+.bw-social {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--bw-fg);
+    border-radius: 50%;
+    color: var(--bw-fg);
+    text-decoration: none;
+}
+
+    .bw-social:hover {
+        background: var(--bw-fg);
+        color: var(--bw-inv-fg);
+    }
+
+.bw-news {
+    display: flex;
+    gap: 8px;
+}
+
+.bw-btn.bw-btn-inline {
+    padding: 6px 12px;
+    background: var(--bw-fg);
+    color: var(--bw-inv-fg);
+    border: 1px solid var(--bw-fg);
+    border-radius: 10px;
+    line-height: 1.2;
+}
+
+    .bw-btn.bw-btn-inline:hover {
+        opacity: .9;
+    }
+
+.bw-footer-bar {
+    border-top: 1px dashed var(--bw-line);
+    background: #fafafa;
+}
+
+.bw-link-underline {
+    color: var(--bw-fg);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+    .bw-link-underline:hover {
+        border-bottom-color: var(--bw-fg);
+    }
+
+/* Respect dark-on-light aesthetic sitewide */
+.footer a {
+    color: inherit;
+}
+/* === Footer: black background, white text, compact === */
+.bw-footer {
+    background: #0f0f10;
+    color: #fff;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+    .bw-footer .text-muted {
+        color: rgba(255,255,255,.72) !important;
+    }
+
+    .bw-footer a,
+    .bw-footer .bw-links a,
+    .bw-footer .bw-link-underline {
+        color: #fff;
+    }
+
+    .bw-footer .bw-link-underline {
+        border-bottom-color: transparent;
+    }
+
+        .bw-footer .bw-link-underline:hover {
+            border-bottom-color: #fff;
+        }
+
+    .bw-footer .container {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+    /* smaller */
+    .bw-footer .bw-footer-bar {
+        background: #0b0b0c;
+        border-top: 1px solid rgba(255,255,255,.12);
+    }
+
+        .bw-footer .bw-footer-bar .container {
+            padding-top: .5rem;
+            padding-bottom: .5rem;
+        }
+
+.bw-social {
+    border-color: #fff;
+    color: #fff;
+}
+
+    .bw-social:hover {
+        background: #fff;
+        color: #000;
+    }
+
+/* Optional: tighten overall admin paddings a bit */
+.bw-main {
+    padding: 20px 20px 32px;
+}
+
+
+/* ===== Admin: full-bleed + stretch + sidebar fills page height ===== */
+:root {
+    /* keep X padding in one place so bleed math stays correct */
+    --main-pad-x: 20px;
+    --main-pad-b: 32px;
+}
+
+/* keep using your current padding, but via vars so we can cancel it cleanly */
+.bw-main {
+    padding: 20px var(--main-pad-x) var(--main-pad-b);
+}
+
+/* make the sidebar grow to the same height as the main column */
+.bw-admin { /* the container of sidebar + main */
+    align-items: stretch; /* stretch children to container height */
+}
+
+.bw-sidebar {
+    position: relative; /* no sticky: we want it to reach the footer */
+    height: auto;
+    min-height: 100%;
+    align-self: stretch;
+}
+
+/* Full-bleed card (touch left edge / sidebar and right edge) */
+.bw-card-bleed {
+    margin-left: calc(var(--main-pad-x) * -1);
+    margin-right: calc(var(--main-pad-x) * -1);
+    border-radius: 0;
+}
+
+/* Stretch card to fill vertical space down toward footer */
+.bw-card-stretch {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - var(--main-pad-b));
+}
+
+    .bw-card-stretch .table-responsive {
+        flex: 1 1 auto;
+        overflow: auto;
+    }
+
+/* If body had any top padding (from earlier code), ensure it’s gone */
+body {
+    padding-top: 0 !important;
+}
+
+@media (min-width: 992px) {
+    body {
+        padding-top: 0 !important;
+    }
+}
+
+/* ===== Black & White Navbar + Mega Menu ===== */
+:root {
+    --bw-bg: #0f0f10;
+    --bw-bg-2: #0b0b0c;
+    --bw-fg: #ffffff;
+    --bw-fg-weak: rgba(255,255,255,.72);
+    --bw-line: rgba(255,255,255,.12);
+    --bw-accent: #ffffff; /* keep pure mono; change if you want a hint of color */
+}
+
+.bw-header {
+    background: var(--bw-bg);
+}
+
+.bw-navbar.navbar {
+    background: var(--bw-bg);
+    border-bottom: 1px solid var(--bw-line);
+}
+
+.bw-navbar .navbar-brand,
+.bw-navbar .navbar-brand:hover,
+.bw-navbar .nav-link,
+.bw-navbar .btn,
+.bw-navbar .btn:hover,
+.bw-navbar .navbar-toggler {
+    color: var(--bw-fg);
+}
+
+.bw-navbar .navbar-toggler {
+    border-color: var(--bw-fg-weak, rgba(255,255,255,.6));
+}
+
+.bw-navbar .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Right-side buttons */
+.bw-navbar .btn-outline-secondary {
+    border-color: var(--bw-fg);
+    color: var(--bw-fg);
+}
+
+    .bw-navbar .btn-outline-secondary:hover {
+        background: var(--bw-fg);
+        color: #000;
+    }
+
+.bw-navbar .badge.bg-danger {
+    background: #e11d48 !important; /* readable on dark */
+}
+
+/* Profile dropdown in dark */
+.bw-navbar .dropdown-menu {
+    background: var(--bw-bg-2);
+    border: 1px solid var(--bw-line);
+}
+
+.bw-navbar .dropdown-item {
+    color: var(--bw-fg);
+}
+
+    .bw-navbar .dropdown-item:hover,
+    .bw-navbar .dropdown-item:focus {
+        color: #000;
+        background: var(--bw-fg);
+    }
+
+.bw-navbar .dropdown-divider {
+    border-top-color: var(--bw-line);
+}
+
+/* Tabs row (MEN / WOMEN / BOYS / GIRLS) */
+.bw-mega-wrap {
+    background: var(--bw-bg);
+    border-top: 1px solid var(--bw-line);
+}
+
+.bw-mega-tabs .nav-link {
+    border-radius: 0;
+    padding: .85rem 1.25rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--bw-fg);
+}
+
+    .bw-mega-tabs .nav-link.active,
+    .bw-mega-tabs .nav-link:hover {
+        color: #000;
+        background: var(--bw-fg);
+    }
+
+/* Mega panels under the tabs */
+.bw-mega-panels {
+    display: none;
+    position: relative;
+    background: var(--bw-bg);
+    border-top: 1px solid var(--bw-line);
+}
+
+    .bw-mega-panels.show {
+        display: block;
+    }
+
+    .bw-mega-panels h6 {
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--bw-fg-weak);
+        margin: .25rem 0 .75rem;
+    }
+
+    .bw-mega-panels .mega-link {
+        display: block;
+        padding: .375rem 0;
+        color: var(--bw-fg);
+        text-decoration: none;
+    }
+
+        .bw-mega-panels .mega-link:hover {
+            color: #000;
+            background: var(--bw-fg);
+        }
+
+
+
+
+/* Order Animations for Admin Dashboard */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes highlightRow {
+    0% {
+        background-color: rgba(40, 167, 69, 0.3);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* Order Notification Styles */
+.order-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-left: 4px solid #1e7e34;
+    animation: slideInRight 0.3s ease-out forwards;
+}
+
+    .order-notification.hiding {
+        animation: slideOutRight 0.3s ease-in forwards;
+    }
+
+    .order-notification.pulse {
+        animation: slideInRight 0.3s ease-out forwards, pulseGlow 2s infinite;
+    }
+
+/* Dynamic order row styles */
+tr[data-dynamic="true"] {
+    animation: highlightRow 2s ease;
+}
+
+/* KPI card animations */
+.bw-card.pulse {
+    animation: pulseGlow 1.5s ease;
+}
+
+/* Test button style */
+.debug-test-btn {
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    z-index: 9999;
+    background: #ffc107;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+    .debug-test-btn:hover {
+        background: #e0a800;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+
+/* ===== Stock Alert & Notification Styles ===== */
+.order-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border-left: 4px solid #007bff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1050;
+    max-width: 300px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+    .order-notification.hiding {
+        animation: slideOutRight 0.3s ease-in forwards;
+        pointer-events: none;
+    }
+
+    /* Stock Alert Variant */
+    .order-notification.stock-alert {
+        background: #fff3cd !important;
+        border-left-color: #ffc107 !important;
+        color: #856404;
+    }
+
+        .order-notification.stock-alert.pulse {
+            animation: slideInRight 0.3s ease-out, stockPulse 2s infinite;
+        }
+
+    /* Stock Restored Variant */
+    .order-notification.stock-restored {
+        background: #d4edda !important;
+        border-left-color: #28a745 !important;
+        color: #155724;
+    }
+
+    /* Connection Error Variant */
+    .order-notification.connection-error {
+        background: #f8d7da !important;
+        border-left-color: #dc3545 !important;
+        color: #721c24;
+    }
+
+/* Animations */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+@keyframes stockPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+/* Low Stock List Items */
+.bw-list-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    animation: slideIn 0.3s ease-out;
+}
+
+    .bw-list-item:last-child {
+        border-bottom: none;
+    }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Remove the invalid CSS at the end of your file */
+
+

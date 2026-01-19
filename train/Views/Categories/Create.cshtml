@@ -1,0 +1,67 @@
+﻿@model train.Models.Category
+@using train.Data
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<h2>Create Category</h2>
+<hr />
+
+<form asp-action="Create" method="post" autocomplete="off">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Name as a SELECT with presets (loaded via JS) -->
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <select asp-for="Name" class="form-select" id="nameSelect">
+            <option value="">-- choose --</option>
+        </select>
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TargetAudience" class="form-label"></label>
+        <select asp-for="TargetAudience" class="form-select" id="audienceSelect">
+            <option>Men</option>
+            <option>Women</option>
+            <option>Boys</option>
+            <option>Girls</option>
+        </select>
+        <span asp-validation-for="TargetAudience" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        async function loadPresetOptions(audience) {
+            try {
+                const res = await fetch(`/admin/categories/preset-options?audience=${encodeURIComponent(audience)}`);
+                if (!res.ok) return;
+                const data = await res.json(); // [{group, items:[...]}]
+                const sel = document.getElementById('nameSelect');
+                sel.innerHTML = '<option value="">-- choose --</option>';
+                for (const grp of data) {
+                    const og = document.createElement('optgroup');
+                    og.label = grp.group;
+                    for (const item of grp.items) {
+                        const opt = document.createElement('option');
+                        opt.value = item;
+                        opt.textContent = item;
+                        og.appendChild(opt);
+                    }
+                    sel.appendChild(og);
+                }
+            } catch { /* ignore */ }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const audSel = document.getElementById('audienceSelect');
+            loadPresetOptions(audSel.value);
+            audSel.addEventListener('change', e => loadPresetOptions(e.target.value));
+        });
+    </script>
+}

@@ -1,0 +1,69 @@
+﻿@model train.ViewModels.CheckoutInfoVm
+
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h2>Checkout Information</h2>
+
+<form asp-action="Info" method="post" class="checkout-form">
+
+    <div class="form-group">
+        <label asp-for="ContactName">Full Name</label>
+        <input asp-for="ContactName" class="form-control" required />
+        <span asp-validation-for="ContactName" class="text-danger"></span>
+    </div>
+
+        <div class="form-group">
+            <label asp-for="ContactEmail">Email Address</label>
+            <input asp-for="ContactEmail" class="form-control" type="email" required />
+            <span asp-validation-for="ContactEmail" class="text-danger"></span>
+        </div>
+
+    <div>
+        <label asp-for="ContactPhone"></label>
+        <input asp-for="ContactPhone" class="form-control" placeholder="Phone" />
+        <span asp-validation-for="ContactPhone" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="City"></label>
+        <input asp-for="City" class="form-control" placeholder="City" />
+    </div>
+
+    <div>
+        <label asp-for="PostalCode"></label>
+        <input asp-for="PostalCode" class="form-control" placeholder="Postal Code" />
+    </div>
+
+    <div>
+        <label asp-for="ShippingAddress"></label>
+        <textarea asp-for="ShippingAddress" class="form-control" placeholder="Shipping Address"></textarea>
+    </div>
+
+    <hr />
+
+    <h4>Order Summary</h4>
+    <ul>
+        @foreach (var item in Model.Items ?? new List<train.ViewModels.CheckoutItemVm>())
+        {
+            <li>
+                @item.ProductName - @item.Quantity × @item.UnitPrice.ToString("C") =
+                <strong>@item.LineTotal.ToString("C")</strong>
+            </li>
+        }
+    </ul>
+
+    <p><strong>Subtotal:</strong> @Model.Subtotal.ToString("C")</p>
+    <p><strong>Total:</strong> @Model.TotalAmount.ToString("C")</p>
+
+    <button type="submit" class="btn btn-primary">Place Order</button>
+    <a asp-controller="Checkout" asp-action="Confirmation" class="btn btn-outline-secondary">Back to Review</a>
+</form>
+@await Html.PartialAsync("_CartToastAndSignalR")
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

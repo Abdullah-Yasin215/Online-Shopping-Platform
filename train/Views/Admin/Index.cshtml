@@ -1,0 +1,353 @@
+﻿@model train.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Panel";
+    ViewData["Fluid"] = true;
+    ViewData["NoPadding"] = true;
+}
+
+@await Html.PartialAsync("StockAlert")
+
+<div class="bw-admin min-vh-100 d-flex">
+    <!-- Sidebar -->
+    <aside class="bw-sidebar d-flex flex-column">
+        <div class="bw-brand">StreetFlux</div>
+        <nav class="bw-nav flex-grow-1">
+            <a asp-controller="Admin" asp-action="Index" class="bw-nav-item active">
+                <span class="bw-dot"></span> Dashboard
+            </a>
+            <a href="/admin/products" class="bw-nav-item">
+                <span class="bw-dot"></span> Products
+            </a>
+            <a asp-controller="Categories" asp-action="Index" class="bw-nav-item">
+                <span class="bw-dot"></span> Categories
+            </a>
+            <a asp-controller="Admin" asp-action="Orders" class="bw-nav-item">
+                <span class="bw-dot"></span> Orders
+            </a>
+        </nav>
+        <div class="bw-nav mt-auto">
+            <a asp-controller="Home" asp-action="Privacy" class="bw-nav-item">
+                <span class="bw-dot"></span> Settings
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="bw-main flex-grow-1">
+        <!-- Topbar -->
+        <div class="bw-topbar d-flex align-items-center gap-3">
+            <div class="bw-title">Dashboard</div>
+            <form class="bw-search ms-auto" role="search">
+                <input class="form-control form-control-sm" placeholder="Search…" />
+            </form>
+            <div class="bw-kv"><span class="bw-k">Date</span><span
+                    class="bw-v">@DateTime.UtcNow.ToLocalTime().ToString("dd MMM yyyy")</span></div>
+            <div class="bw-kv"><span class="bw-k">Time</span><span
+                    class="bw-v">@DateTime.UtcNow.ToLocalTime().ToString("hh:mm tt")</span></div>
+        </div>
+
+        <!-- KPI cards -->
+        <section class="bw-grid">
+            <div class="bw-card">
+                <div class="bw-kpi-label">Products</div>
+                <div class="bw-kpi-value">@Model.ProductCount</div>
+                <a href="/admin/products" class="bw-link">Show All</a>
+            </div>
+            <div class="bw-card">
+                <div class="bw-kpi-label">Categories</div>
+                <div class="bw-kpi-value">@Model.CategoryCount</div>
+                <a asp-controller="Categories" asp-action="Index" class="bw-link">Show All</a>
+            </div>
+            <div class="bw-card">
+                <div class="bw-kpi-label">Orders (total)</div>
+                <div class="bw-kpi-value" data-orders-total>@Model.OrdersTotal</div>
+                <a asp-controller="Admin" asp-action="Orders" class="bw-link">Show All</a>
+            </div>
+            <div class="bw-card">
+                <div class="bw-kpi-label">Pending</div>
+                <div class="bw-kpi-value" data-orders-pending>@Model.OrdersPending</div>
+                <a asp-controller="Admin" asp-action="Orders" class="bw-link">Show All</a>
+            </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="bw-actions">
+            <a class="bw-btn" href="/admin/products/create">+ New Product</a>
+            <a class="bw-btn bw-btn-outline" asp-controller="Categories" asp-action="Create">+ New Category</a>
+            <a class="bw-btn bw-btn-outline" href="/admin/products">All Products</a>
+            <a class="bw-btn bw-btn-outline" asp-controller="Admin" asp-action="Orders">All Orders</a>
+        </section>
+
+        <!-- In your Admin Dashboard View -->
+        <div class="bw-card">
+            <div class="bw-card-head">
+                <div class="bw-card-title">Low Stock Alerts</div>
+            </div>
+            <div id="low-stock-alerts" class="bw-list small">
+                @if (ViewBag.LowStockProducts != null && ViewBag.LowStockProducts.Count > 0)
+                {
+                    foreach (var product in ViewBag.LowStockProducts)
+                    {
+                        <div class="bw-list-item low-stock-item" data-product-id="@product.ProductId">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>@product.Name</strong>
+                                    <div class="text-warning fw-bold">Stock: @product.Stock</div>
+                                    <small class="text-muted">ID: @product.ProductId</small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">Low stock</small>
+                                    <div class="mt-1">
+                                        <a href="/admin/products/edit/@product.ProductId"
+                                            class="btn btn-sm btn-outline-warning">Restock</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">Live alerts will appear here.</div>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <section class="bw-card bw-card-bleed bw-card-stretch">
+            <div class="bw-card-head">
+                <div class="bw-card-title">Recent Orders</div>
+                <a asp-controller="Admin" asp-action="Orders" class="bw-link">View all</a>
+            </div>
+
+            @if (!Model.RecentOrders.Any())
+            {
+                <div class="text-muted px-3 pb-3">No orders yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0" id="recent-orders">
+                        <thead class="bw-thead">
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="align-middle" id="orders-tbody">
+                            @foreach (var o in Model.RecentOrders)
+                            {
+                                <tr data-order-id="@o.Id">
+                                    <td>@o.Id</td>
+                                    <td>@o.Email</td>
+                                    <td>@o.Date.ToLocalTime().ToString("g")</td>
+                                    <td><span class="bw-badge">@o.Status</span></td>
+                                    <td class="text-end">@o.Total.ToString("C")</td>
+                                    <td class="text-end">
+                                        <a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@o.Id"
+                                            class="bw-link">Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </main>
+</div>
+@section Scripts {
+    <script src="~/lib/signalr.min.js"></script>
+    <script>
+        // Debug function
+        function debugLog(message, data = null) {
+            console.log(`🔧 [StreetFlux Debug] ${message}`, data || '');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            debugLog('Page loaded - initializing dashboard');
+            // Start SignalR connections
+            initializeSignalR();
+        });
+
+        // Update low stock alerts container with all alerts
+        function updateLowStockUI(product, isLowStock) {
+            const container = document.getElementById('low-stock-alerts');
+            if (!container) return;
+
+            // Remove existing if present
+            const existing = container.querySelector(`.low-stock-item[data-product-id="${product.productId}"]`);
+            if (existing) existing.remove();
+
+            // If not low stock (restored), we're done (after removing)
+            if (!isLowStock) {
+                // Check if empty
+                if (container.children.length === 0) {
+                    container.innerHTML = '<div class="text-muted">Live alerts will appear here.</div>';
+                }
+                return;
+            }
+
+            // If low stock, add it
+            // Remove empty message if present
+            const emptyMsg = container.querySelector('.text-muted');
+            if (emptyMsg && emptyMsg.innerText.includes('Live alerts')) emptyMsg.remove();
+
+            const html = `
+                    <div class="bw-list-item low-stock-item" data-product-id="${product.productId}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${product.name}</strong>
+                                <div class="text-warning fw-bold">Stock: ${product.stock}</div>
+                                <small class="text-muted">ID: ${product.productId}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">Just now</small>
+                                <div class="mt-1">
+                                    <a href="/admin/products/edit/${product.productId}" class="btn btn-sm btn-outline-warning">Restock</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Show notification when stock is restored
+        function showStockRestoredNotification(product) {
+            const notification = document.createElement('div');
+            notification.className = 'order-notification';
+            notification.style.background = '#28a745';
+            notification.style.borderLeftColor = '#218838';
+
+            notification.innerHTML = `
+                    <strong>✅ Stock Restored</strong><br>
+                    <small>${product.name} - Now ${product.stock} in stock</small>
+                `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Show stock alert toast
+        function showStockAlert(product) {
+            // Show toast notification
+            const notification = document.createElement('div');
+            notification.className = 'order-notification stock-alert pulse';
+            notification.style.background = '#fd7e14';
+            notification.style.borderLeftColor = '#e55a00';
+
+            notification.innerHTML = `
+                    <strong>📦 Low Stock Alert!</strong><br>
+                    <small>${product.name} - Only ${product.stock} left in stock</small>
+                    <div class="mt-1">
+                        <small>Product ID: ${product.productId}</small>
+                    </div>
+                `;
+
+            document.body.appendChild(notification);
+
+            // Remove toast after 6 seconds
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 6000);
+        }
+
+        // Initialize SignalR connections
+        function initializeSignalR() {
+            try {
+                debugLog('Attempting to connect to SignalR hubs');
+
+                // Orders Hub
+                const ordersConn = new signalR.HubConnectionBuilder()
+                    .withUrl("/hubs/admin")
+                    .withAutomaticReconnect()
+                    .build();
+
+                ordersConn.on("OrderCreated", (order) => {
+                    // Must call handleNewOrder if it exists
+                    if (typeof handleNewOrder === 'function') handleNewOrder(order);
+                });
+
+                ordersConn.start()
+                    .then(() => debugLog('✅ SignalR Orders Hub Connected'))
+                    .catch(err => {
+                        // showConnectionError() call
+                        if (typeof showConnectionError === 'function') showConnectionError();
+                    });
+
+                // Stock Hub
+                const stockConn = new signalR.HubConnectionBuilder()
+                    .withUrl("/hubs/stock")
+                    .withAutomaticReconnect()
+                    .build();
+
+                stockConn.on("LowStockAlert", (product) => {
+                    debugLog('SignalR: LowStockAlert received', product);
+                    showStockAlert(product);
+                    // Update the list UI dynamically
+                    updateLowStockUI(product, true);
+                });
+
+                // Add handler for stock restored events
+                stockConn.on("StockRestored", (product) => {
+                    debugLog('SignalR: StockRestored received', product);
+                    showStockRestoredNotification(product);
+                    // Update the list UI dynamically
+                    updateLowStockUI(product, false);
+                });
+
+                stockConn.start()
+                    .then(() => debugLog('✅ SignalR Stock Hub Connected'))
+                    .catch(err => debugLog('❌ SignalR Stock Hub failed', err));
+
+            } catch (error) {
+                debugLog('SignalR initialization error', error);
+            }
+        }
+
+        // Fallback for showConnectionError
+        function showConnectionError() {
+            const notification = document.createElement('div');
+            notification.className = 'order-notification';
+            notification.style.background = '#dc3545';
+            notification.style.borderLeftColor = '#c82333';
+
+            notification.innerHTML = `
+                    <strong>⚠️ Connection Issue</strong><br>
+                    <small>Real-time updates disabled</small>
+                `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+    </script>
+}

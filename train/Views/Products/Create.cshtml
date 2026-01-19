@@ -1,0 +1,62 @@
+﻿@model train.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = "Create Product";
+}
+<h2>Create Product</h2>
+<hr />
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @await Html.PartialAsync("_Form", Model)
+
+    <div class="mb-3 mt-3">
+        <label asp-for="ImageFile" class="form-label"></label>
+        <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const audienceSelect = document.getElementById('targetAudienceSelect');
+            const categorySelect = document.getElementById('categorySelect');
+
+            if (audienceSelect && categorySelect) {
+                audienceSelect.addEventListener('change', async function() {
+                    const audience = this.value;
+                    
+                    // Clear current options except the default
+                    categorySelect.innerHTML = '<option value="">-- Select Category --</option>';
+                    
+                    try {
+                        // Fetch categories for the selected audience
+                        const response = await fetch(`/admin/categories/for-audience?audience=${encodeURIComponent(audience)}`);
+                        
+                        if (response.ok) {
+                            const categories = await response.json();
+                            
+                            // Add new options
+                            categories.forEach(cat => {
+                                const option = document.createElement('option');
+                                option.value = cat.id;
+                                // Include color in label if available
+                                const label = cat.color && cat.color.trim() !== '' ? `${cat.name} (${cat.color})` : cat.name;
+                                option.textContent = label;
+                                categorySelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Failed to fetch categories');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching categories:', error);
+                    }
+                });
+            }
+        });
+    </script>
+}

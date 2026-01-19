@@ -1,0 +1,22 @@
+﻿@model train.Models.Category
+@{
+    ViewData["Title"] = "Delete Category";
+    var hasProducts = (bool)(ViewBag.HasProducts ?? false);
+}
+
+<h2>Delete Category</h2>
+<hr />
+
+<div class="alert alert-warning">
+    <strong>Are you sure?</strong> You are about to delete <em>@Model.Name</em> (@Model.TargetAudience).
+    @if (hasProducts)
+    {
+        <div class="mt-2 text-danger">This category has products and cannot be deleted.</div>
+    }
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger" disabled="@(hasProducts ? "disabled" : null)">Delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

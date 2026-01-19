@@ -1,0 +1,72 @@
+﻿@model train.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+<h2>Edit Product</h2>
+<hr />
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @await Html.PartialAsync("_AudienceCategoryPicker", Model)
+
+    <div class="mb-3 mt-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Price" class="form-label"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Stock" class="form-label"></label>
+            <input asp-for="Stock" class="form-control" />
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <div class="col-md-6">
+            <label asp-for="Sizes" class="form-label">Sizes (comma-separated, e.g. S, M, L)</label>
+            <input asp-for="Sizes" class="form-control" placeholder="S, M, L, XL" />
+            <span asp-validation-for="Sizes" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Colors" class="form-label">Colors (comma-separated, e.g. Black, White)</label>
+            <input asp-for="Colors" class="form-control" placeholder="Black, White, Gray" />
+            <span asp-validation-for="Colors" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3 mt-3">
+        <label asp-for="ImageFile" class="form-label"></label>
+        <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+                <input type="hidden" asp-for="ImageUrl" />
+                <div class="mt-2">
+                    <label class="form-label">Current Image:</label>
+                    <div>
+                        <img src="@Model.ImageUrl" alt="Product Image" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px;" />
+                    </div>
+                    <small class="text-muted">Upload a new image to replace the current one</small>
+               </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

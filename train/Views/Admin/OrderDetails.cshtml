@@ -1,0 +1,181 @@
+﻿@model train.Models.Order
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Order #@Model.Id</h2>
+                <a asp-controller="Admin" asp-action="Orders" class="btn btn-outline-secondary">
+                    ← Back to All Orders
+                </a>
+            </div>
+
+            <!-- Order Header -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <strong>Order Date:</strong>
+                                @Model.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            </div>
+                            <div class="mb-2">
+                                <strong>Status:</strong>
+                                <span class="badge bg-primary">@Model.Status</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <strong>Total Amount:</strong>
+                                <span class="fw-bold">@Model.TotalAmount.ToString("C")</span>
+                            </div>
+                            @if (Model.Discount > 0)
+                            {
+                                <div class="mb-2">
+                                    <strong>Discount:</strong>
+                                    <span class="text-danger">-@Model.Discount.ToString("C")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Customer Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Customer Name:</strong>
+                                <div>@(Model.User?.UserName ?? Model.ContactName ?? "Guest")</div>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Email:</strong>
+                                <div>@(Model.User?.Email ?? Model.ContactEmail ?? "—")</div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Model.ContactPhone))
+                            {
+                                <div class="mb-3">
+                                    <strong>Phone:</strong>
+                                    <div>@Model.ContactPhone</div>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            @if (!string.IsNullOrWhiteSpace(Model.ShippingAddress))
+                            {
+                                <div class="mb-3">
+                                    <strong>Shipping Address:</strong>
+                                    <div class="text-muted">
+                                        @Model.ShippingAddress
+                                        @if (!string.IsNullOrWhiteSpace(Model.City))
+                                        {
+                                            <br />
+
+                                            @Model.City
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(Model.PostalCode))
+                                        {
+                                        <br />
+                                            @Model.PostalCode
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Order Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Details</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items?.Any() == true)
+                                {
+                                    foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold">@item.ProductName</td>
+                                            <td class="text-muted small">
+                                                @if (!string.IsNullOrWhiteSpace(item.CategoryName))
+                                                {
+                                                    <div>Category: @item.CategoryName</div>
+                                                }
+                                                @if (!string.IsNullOrWhiteSpace(item.Color))
+                                                {
+                                                    <div>Color: @item.Color</div>
+                                                }
+                                                <div>Product ID: @item.ProductId</div>
+                                            </td>
+                                            <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-end fw-bold">@item.LineTotal.ToString("C")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            No items found in this order
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td class="text-end fw-bold">Subtotal:</td>
+                                    <td class="text-end fw-bold">@Model.Subtotal.ToString("C")</td>
+                                </tr>
+                                @if (Model.ShippingFee > 0)
+                                {
+                                    <tr>
+                                        <td colspan="3"></td>
+                                        <td class="text-end">Shipping:</td>
+                                        <td class="text-end">@Model.ShippingFee.ToString("C")</td>
+                                    </tr>
+                                }
+                                @if (Model.Discount > 0)
+                                {
+                                    <tr>
+                                        <td colspan="3"></td>
+                                        <td class="text-end text-danger">Discount:</td>
+                                        <td class="text-end text-danger">-@Model.Discount.ToString("C")</td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td class="text-end fw-bold fs-6">Grand Total:</td>
+                                    <td class="text-end fw-bold fs-6">@Model.TotalAmount.ToString("C")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

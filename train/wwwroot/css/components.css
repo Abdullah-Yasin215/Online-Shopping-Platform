@@ -1,0 +1,323 @@
+/* ========================================
+   Component Enhancements
+   ======================================== */
+
+/* === Product Cards === */
+
+.product-card {
+    transition: all var(--transition-base);
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.product-card:hover {
+    box-shadow: var(--shadow-xl);
+    border-color: var(--color-border-light) !important;
+}
+
+.product-card:hover .product-quick-actions {
+    opacity: 1 !important;
+}
+
+.product-card .card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.product-card .price {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.product-card .badge {
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* === Enhanced Buttons === */
+
+.btn-primary {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    font-weight: 500;
+    transition: all var(--transition-base);
+}
+
+.btn-primary:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* === Header Enhancements === */
+
+.bw-header {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all var(--transition-base);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.bw-header.scrolled {
+    box-shadow: var(--shadow-md);
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* === Mega Menu Animations === */
+
+.bw-mega-panels {
+    animation: fadeIn var(--transition-base);
+}
+
+.mega-link {
+    position: relative;
+    transition: color var(--transition-fast);
+    display: inline-block;
+}
+
+.mega-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-secondary);
+    transition: width var(--transition-base);
+}
+
+.mega-link:hover::after {
+    width: 100%;
+}
+
+/* === Form Enhancements === */
+
+.form-control,
+.form-select {
+    border-radius: var(--radius-md);
+    border-color: var(--color-border);
+    transition: all var(--transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.1);
+}
+
+/* === Modal Enhancements === */
+
+.modal-content {
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-2xl);
+}
+
+.modal-header {
+    border-bottom-color: var(--color-border);
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top-color: var(--color-border);
+    padding: 1.5rem;
+}
+
+/* === Badge Enhancements === */
+
+.badge {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+.badge.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+/* === Cart Badge Pulse === */
+
+#cart-count {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* === Table Enhancements === */
+
+.table {
+    border-color: var(--color-border);
+}
+
+.table thead th {
+    background-color: var(--color-bg-alt);
+    border-bottom: 2px solid var(--color-border);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background-color: var(--color-bg-alt);
+}
+
+/* === Footer Enhancements === */
+
+.bw-footer {
+    background-color: var(--color-bg-dark);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.bw-footer a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color var(--transition-fast);
+}
+
+.bw-footer a:hover {
+    color: white;
+}
+
+/* === Quantity Controls === */
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantity-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.quantity-btn:hover {
+    transform: scale(1.1);
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: white;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.375rem;
+}
+
+/* === Alert Enhancements === */
+
+.alert {
+    border-radius: var(--radius-lg);
+    border: none;
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #047857;
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #b91c1c;
+}
+
+.alert-info {
+    background-color: rgba(79, 70, 229, 0.1);
+    color: #4338ca;
+}
+
+/* === Breadcrumb Enhancements === */
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "→";
+    color: var(--color-text-muted);
+}
+
+.breadcrumb-item a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--color-secondary);
+}
+
+/* === Card General Enhancements === */
+
+.card {
+    border-radius: var(--radius-lg);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.card-header {
+    background-color: var(--color-bg-alt);
+    border-bottom-color: var(--color-border);
+    font-weight: 600;
+}
+
+/* === Pagination Enhancements === */
+
+.pagination .page-link {
+    color: var(--color-text);
+    border-color: var(--color-border);
+    transition: all var(--transition-fast);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--color-bg-alt);
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+/* === Responsive Enhancements === */
+
+@media (max-width: 768px) {
+    .product-card .card-img-top {
+        height: 200px !important;
+    }
+
+    .product-card .card-title {
+        font-size: 0.9rem;
+    }
+
+    .product-card .price {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "Support";
+}
+
+<div class="container py-5">
+    <h1>Support</h1>
+    <p class="lead">We're here to help. Get in touch with us.</p>
+
+    <div class="row mt-5">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-envelope-fill me-2"></i> Email Us</h5>
+                    <p class="card-text">For general inquiries, orders, and returns.</p>
+                    <a href="mailto:support@streetflux.com" class="btn btn-primary">support@streetflux.com</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-telephone-fill me-2"></i> Call Us</h5>
+                    <p class="card-text">Available Mon-Fri, 9am - 5pm EST.</p>
+                    <a href="tel:+1234567890" class="btn btn-outline-primary">+1 (234) 567-890</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h4>Frequently Asked Questions</h4>
+        <div class="accordion mt-3" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        How long does shipping take?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Standard shipping typically takes 3-5 business days. Express options are available at checkout.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        What is your return policy?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        We accept returns within 30 days of purchase for unworn items with original tags.
+                    </div>
+                </div>
+            </div>
+             <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Do you ship internationally?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Yes, we verify updated shipping rates at checkout based on your location.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

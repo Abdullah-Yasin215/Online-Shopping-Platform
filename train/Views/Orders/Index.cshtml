@@ -1,0 +1,42 @@
+﻿@model List<train.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<h2>My Orders</h2>
+<hr />
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">You don’t have any orders yet.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td>@o.Id</td>
+                        <td>@o.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@o.Status</td>
+                        <td class="text-end">@o.TotalAmount.ToString("C")</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

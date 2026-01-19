@@ -1,0 +1,188 @@
+﻿@model train.ViewModels.CartIndexViewModel
+@{
+    ViewData["Title"] = "Your Cart";
+}
+<h2>Your Cart</h2>
+<hr />
+
+
+@if (TempData["Ok"] is string ok && !string.IsNullOrEmpty(ok))
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["Error"] is string err && !string.IsNullOrEmpty(err))
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info">Your cart is empty.</div>
+    <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Start shopping</a>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="text-end">Unit</th>
+                    <th style="width:160px;">Qty</th>
+                    <th class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model.Items)
+                {
+                    <tr data-row data-unit="@i.UnitPrice" data-product-id="@i.ProductId">
+                        <td>
+                            <div class="fw-bold">@i.Name</div>
+                            <div class="text-muted small">@i.Category @if (!string.IsNullOrWhiteSpace(i.Color))
+                                {
+                                    <span>· @i.Color</span>
+                                }</div>
+                        </td>
+
+                        <td class="text-end unit">@i.UnitPrice.ToString("C")</td>
+
+                        <td class="text-nowrap">
+                            <input class="form-control form-control-sm qty-input d-inline-block auto-update"
+                                   data-product-id="@i.ProductId"
+                                   name="quantity"
+                                   type="number"
+                                   min="1"
+                                   value="@i.Quantity"
+                                   style="width:90px;">
+                        </td>
+                        <td class="text-end line-total">@i.LineTotal.ToString("C")</td>
+
+                        <td class="text-end">
+                            <form asp-action="Remove" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@i.ProductId" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2" id="itemsLabel">Items: <span id="itemsCount">@Model.TotalQuantity</span></th>
+                    <th class="text-end">Subtotal:</th>
+                    <th class="text-end" id="subtotal">@Model.Subtotal.ToString("C")</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">
+            Continue shopping
+        </a>
+
+        <div class="ms-auto d-flex gap-2">
+            <form asp-action="Clear" method="post">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-outline-danger" type="submit">Clear Cart</button>
+            </form>
+
+            <!-- This must be an <a>, not a <button> inside the update form -->
+            <a asp-controller="Checkout" asp-action="Info" class="btn btn-primary">
+                Proceed to Checkout
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-update on quantity change
+            document.querySelectorAll('.qty-input.auto-update').forEach(input => {
+                input.addEventListener('change', function() {
+                    updateQuantity(this);
+                });
+
+                // Optional: Also update on input (real-time) with debounce
+                let timeout;
+                input.addEventListener('input', function() {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        updateQuantity(this);
+                    }, 1000); // Wait 1 second after user stops typing
+                });
+            });
+
+            async function updateQuantity(input) {
+                const productId = input.dataset.productId;
+                const quantity = parseInt(input.value);
+
+                if (quantity < 1) {
+                    input.value = 1;
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/cart/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: `productId=${productId}&qty=${quantity}`
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            // Update the UI immediately
+                            updateCartUI(result);
+                        }
+                    } else {
+                        console.error('Failed to update quantity');
+                        // Revert input value on error
+                        input.value = input.defaultValue;
+                    }
+                } catch (error) {
+                    console.error('Error updating quantity:', error);
+                    input.value = input.defaultValue;
+                }
+            }
+
+            function updateCartUI(data) {
+                // Update item subtotal
+                const row = document.querySelector(`[data-product-id="${data.productId}"]`);
+                if (row) {
+                    const lineTotalElement = row.querySelector('.line-total');
+                    if (lineTotalElement) {
+                        lineTotalElement.textContent = formatCurrency(data.itemSubtotal);
+                    }
+                }
+
+                // Update cart totals
+                const subtotalElement = document.getElementById('subtotal');
+                const itemsCountElement = document.getElementById('itemsCount');
+
+                if (subtotalElement) subtotalElement.textContent = formatCurrency(data.subtotal);
+                if (itemsCountElement) itemsCountElement.textContent = data.totalQuantity;
+            }
+
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-AE', {
+                    style: 'currency',
+                    currency: 'AED'
+                }).format(amount);
+            }
+        });
+    </script>
+    @await Html.PartialAsync("_CartToastAndSignalR")
+
+
+
+
+    
+
+
+}

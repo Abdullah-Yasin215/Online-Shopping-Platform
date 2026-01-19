@@ -1,0 +1,55 @@
+﻿@model train.ViewModels.CatalogIndexViewModel
+
+@{
+    ViewData["Title"] = "Catalog";
+}
+
+<div class="container py-5">
+    @* Heading *@
+    <div class="text-center mb-5 animate-fade-in">
+        <h1 class="fw-bold display-5" style="letter-spacing: -0.02em;">@Model.Heading</h1>
+        <p class="text-muted" style="font-size: 1.1rem;">Find exactly what you're looking for</p>
+    </div>
+
+    @* Toolbar *@
+    <partial name="_FilterToolbar" model="Model" />
+
+    @* Product Grid *@
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col">
+                <partial name="ProductCard" model="product" />
+            </div>
+        }
+    </div>
+
+    @* Pagination *@
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        <div class="mt-5 d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item @(Model.Pagination.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link"
+                            href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, q = Model.Query, categoryId = Model.CategoryId, audience = Model.Audience, minPrice = Model.MinPrice, maxPrice = Model.MaxPrice, color = Model.SelectedColor, size = Model.SelectedSize, sort = Model.Sort })">Previous</a>
+                    </li>
+                    @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.Pagination.CurrentPage == i ? "active" : "")">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { page = i, q = Model.Query, categoryId = Model.CategoryId, audience = Model.Audience, minPrice = Model.MinPrice, maxPrice = Model.MaxPrice, color = Model.SelectedColor, size = Model.SelectedSize, sort = Model.Sort })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.Pagination.CurrentPage == Model.Pagination.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                            href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, q = Model.Query, categoryId = Model.CategoryId, audience = Model.Audience, minPrice = Model.MinPrice, maxPrice = Model.MaxPrice, color = Model.SelectedColor, size = Model.SelectedSize, sort = Model.Sort })">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+@* Offcanvas Sidebar (Placed outside container to avoid overflow issues) *@
+<partial name="_FilterSidebar" model="Model" />

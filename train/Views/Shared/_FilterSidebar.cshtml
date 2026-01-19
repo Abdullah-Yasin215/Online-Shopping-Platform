@@ -1,0 +1,118 @@
+@model train.ViewModels.CatalogIndexViewModel
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="filterOffcanvasLabel">Filters</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" id="filterForm" class="d-flex flex-column gap-4">
+            @* Preserve existing query params *@
+            <input type="hidden" name="q" value="@Model.Query" />
+            <input type="hidden" name="audience" value="@Model.Audience" />
+            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+            <input type="hidden" name="sort" value="@Model.Sort" />
+
+            @* Categories (if any) *@
+            @if (Model.Categories != null && Model.Categories.Any())
+            {
+                <div>
+                    <h6 class="fw-bold mb-3">Category</h6>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="@Url.Action("Index", new { audience = Model.Audience, q = Model.Query })"
+                                class="text-decoration-none @(Model.CategoryId == null ? "text-dark fw-bold" : "text-muted")">
+                                All Categories
+                            </a>
+                        </li>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", new { audience = Model.Audience, categoryId = cat.Value, q = Model.Query })"
+                                    class="text-decoration-none @(cat.Selected ? "text-dark fw-bold" : "text-muted")">
+                                    @cat.Text
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <hr class="text-muted" />
+            }
+
+            @* Price Slider *@
+            <div>
+                <h6 class="fw-bold mb-3">Price</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Min"
+                        value="@Model.MinPrice" />
+                    <span>-</span>
+                    <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Max"
+                        value="@Model.MaxPrice" />
+                </div>
+            </div>
+
+            <hr class="text-muted" />
+
+            @* Size Filter *@
+            <div>
+                <h6 class="fw-bold mb-3">Size</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <input type="radio" class="btn-check" name="size" id="size_all" value=""
+                    @(string.IsNullOrEmpty(Model.SelectedSize) ? "checked" : "") onchange="this.form.submit()">
+                    <label class="btn btn-outline-secondary btn-sm" for="size_all">All</label>
+
+                    @if (Model.Sizes != null)
+                    {
+                        @foreach (var s in Model.Sizes.Skip(1))
+                        {
+                            var id = $"size_{s.Value}";
+                            <input type="radio" class="btn-check" name="size" id="@id" value="@s.Value" @(s.Selected ? "checked"
+                        : "") onchange="this.form.submit()">
+                            <label class="btn btn-outline-secondary btn-sm" for="@id">@s.Text</label>
+                        }
+                    }
+                </div>
+            </div>
+
+            <hr class="text-muted" />
+
+            @* Color Filter *@
+            <div>
+                <h6 class="fw-bold mb-3">Color</h6>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="color" id="color_all" value=""
+                        @(string.IsNullOrEmpty(Model.SelectedColor) ? "checked" : "") onchange="this.form.submit()">
+                        <label class="form-check-label" for="color_all">All Colors</label>
+                    </div>
+                    @if (Model.Colors != null)
+                    {
+                        @foreach (var c in Model.Colors.Skip(1))
+                        {
+                            var id = $"color_{c.Value}";
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="color" id="@id" value="@c.Value" @(c.Selected
+                            ? "checked" : "") onchange="this.form.submit()">
+                                <label class="form-check-label" for="@id">@c.Text</label>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="mt-4 d-grid gap-2">
+                <button type="submit" class="btn btn-dark">Apply Filters</button>
+                @if (string.IsNullOrEmpty(Model.Mode) || Model.Mode != "Admin")
+                {
+                    <a href="@Url.Action("Index", new { audience = Model.Audience })"
+                        class="btn btn-outline-secondary">Clear All</a>
+                }
+                else
+                {
+                    @* Admin mode: clear audience to show EVERYTHING *@
+                    <a href="@Url.Action("Index", new { audience = "" })" class="btn btn-outline-secondary">Clear All</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>

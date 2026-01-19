@@ -1,0 +1,771 @@
+﻿@* Views/Shared/_Layout.cshtml *@
+@using System.Linq
+@using train.Models
+
+@inject train.Repositories.Abstractions.ICategoryRepository CatRepo
+@{
+    // Load top-level categories for each audience (used to build links with real IDs)
+    var menCats = await CatRepo.GetByAudienceAsync("Men", null);
+    var womenCats = await CatRepo.GetByAudienceAsync("Women", null);
+    var boysCats = await CatRepo.GetByAudienceAsync("Boys", null);
+    var girlsCats = await CatRepo.GetByAudienceAsync("Girls", null);
+
+    Func<System.Collections.Generic.IEnumerable<Category>, string, Category?> pick =
+    (list, name) => list.FirstOrDefault(c => string.Equals(c.Name, name, System.StringComparison.OrdinalIgnoreCase));
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StreetFlux</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Modern Theme Styles -->
+    <link rel="stylesheet" href="~/css/modern-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/loading-states.css" asp-append-version="true" />
+
+    <!-- Original Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/train.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    @RenderSection("Styles", required: false)
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header / Navbar -->
+    <header class="bw-header shadow-sm sticky-top">
+        <nav class="navbar navbar-expand-lg bw-navbar">
+            <div class="container py-2">
+
+                <!-- Hamburger for sidebar (mobile) -->
+                <button class="btn btn-outline-secondary me-2 d-lg-none" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#mainMenu" aria-controls="mainMenu" aria-label="Open menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-bag-check fs-3 me-2"></i>
+                    <span>StreetFlux</span>
+                </a>
+
+                <!-- Mobile toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Center nav + Right actions -->
+                <div class="collapse navbar-collapse" id="mainNav">
+
+                    @* --- Category Tabs Bar (MEN/WOMEN/BOYS/GIRLS) --- *@
+                    <div class="bw-mega-wrap d-none d-lg-block w-100">
+                        <div class="container">
+                            <ul class="nav nav-justified bw-mega-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#tab-men" role="tab"
+                                        aria-controls="tab-men" aria-selected="true">MEN</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#tab-women" role="tab"
+                                        aria-controls="tab-women" aria-selected="false">WOMEN</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#tab-boys" role="tab"
+                                        aria-controls="tab-boys" aria-selected="false">BOYS</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="tab" href="#tab-girls" role="tab"
+                                        aria-controls="tab-girls" aria-selected="false">GIRLS</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Mega panels -->
+                        <div class="bw-mega-panels tab-content">
+                            <!-- MEN -->
+                            <div class="tab-pane fade show active" id="tab-men" role="tabpanel">
+                                <div class="container py-4">
+                                    <div class="row g-4">
+                                        <div class="col-12 col-md-4">
+                                            <h6>FRESH FINDS</h6>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="NewIn"
+                                                asp-route-audience="Men">New In</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                asp-route-audience="Men" asp-route-q="Best Sellers">Best Sellers</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Essentials"
+                                                asp-route-audience="Men">Essentials</a>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>CLOTHING</h6>
+                                            @if (pick(menCats, "Tees") is Category m1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m1.Id">Tees</a>
+                                            }
+                                            @if (pick(menCats, "Polos") is Category m2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m2.Id">Polos</a>
+                                            }
+                                            @if (pick(menCats, "Shirts") is Category m3)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m3.Id">Shirts</a>
+                                            }
+                                            @if (pick(menCats, "Jackets / Coats") is Category m4)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m4.Id">Jackets /
+                                                    Coats</a>
+                                            }
+                                            @if (pick(menCats, "Sweaters") is Category m5)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m5.Id">Sweaters</a>
+                                            }
+                                            @if (pick(menCats, "Sweatshirts / Hoodies") is Category m6)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@m6.Id">Sweatshirts /
+                                                    Hoodies</a>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>BOTTOMS</h6>
+                                            @if (pick(menCats, "Jeans") is Category mb1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@mb1.Id">Jeans</a>
+                                            }
+                                            @if (pick(menCats, "Cargo Pants") is Category mb2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@mb2.Id">Cargo Pants</a>
+                                            }
+                                            @if (pick(menCats, "Trousers / Chinos") is Category mb3)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@mb3.Id">Trousers /
+                                                    Chinos</a>
+                                            }
+                                            @if (pick(menCats, "Joggers") is Category mb4)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@mb4.Id">Joggers</a>
+                                            }
+                                            @if (pick(menCats, "Shorts") is Category mb5)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Men" asp-route-categoryId="@mb5.Id">Shorts</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WOMEN -->
+                            <div class="tab-pane fade" id="tab-women" role="tabpanel">
+                                <div class="container py-4">
+                                    <div class="row g-4">
+                                        <div class="col-12 col-md-4">
+                                            <h6>FRESH FINDS</h6>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="NewIn"
+                                                asp-route-audience="Women">New In</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                asp-route-audience="Women" asp-route-q="Best Sellers">Best Sellers</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Essentials"
+                                                asp-route-audience="Women">Essentials</a>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>CLOTHING</h6>
+                                            @if (pick(womenCats, "Tops & Tees") is Category w1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w1.Id">Tops & Tees</a>
+                                            }
+                                            @if (pick(womenCats, "Dresses") is Category w2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w2.Id">Dresses</a>
+                                            }
+                                            @if (pick(womenCats, "Polos") is Category w3)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w3.Id">Polos</a>
+                                            }
+                                            @if (pick(womenCats, "Shirts") is Category w4)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w4.Id">Shirts</a>
+                                            }
+                                            @if (pick(womenCats, "Jackets") is Category w5)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w5.Id">Jackets</a>
+                                            }
+                                            @if (pick(womenCats, "Sweaters") is Category w6)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w6.Id">Sweaters</a>
+                                            }
+                                            @if (pick(womenCats, "Sweatshirts / Hoodies") is Category w7)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@w7.Id">Sweatshirts /
+                                                    Hoodies</a>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>BOTTOMS</h6>
+                                            @if (pick(womenCats, "Jeans") is Category wb1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@wb1.Id">Jeans</a>
+                                            }
+                                            @if (pick(womenCats, "Skirts") is Category wb2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@wb2.Id">Skirts</a>
+                                            }
+                                            @if (pick(womenCats, "Trousers") is Category wb3)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Women" asp-route-categoryId="@wb3.Id">Trousers</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BOYS -->
+                            <div class="tab-pane fade" id="tab-boys" role="tabpanel">
+                                <div class="container py-4">
+                                    <div class="row g-4">
+                                        <div class="col-12 col-md-4">
+                                            <h6>HIGHLIGHTS</h6>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="NewIn"
+                                                asp-route-audience="Boys">New In</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                asp-route-audience="Boys" asp-route-q="Graphic">Graphic Tees</a>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>CLOTHING</h6>
+                                            @if (pick(boysCats, "Shirts") is Category b1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Boys" asp-route-categoryId="@b1.Id">Shirts</a>
+                                            }
+                                            @if (pick(boysCats, "Hoodies") is Category b2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Boys" asp-route-categoryId="@b2.Id">Hoodies</a>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>BOTTOMS</h6>
+                                            @if (pick(boysCats, "Jeans") is Category bb1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Boys" asp-route-categoryId="@bb1.Id">Jeans</a>
+                                            }
+                                            @if (pick(boysCats, "Shorts") is Category bb2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Boys" asp-route-categoryId="@bb2.Id">Shorts</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GIRLS -->
+                            <div class="tab-pane fade" id="tab-girls" role="tabpanel">
+                                <div class="container py-4">
+                                    <div class="row g-4">
+                                        <div class="col-12 col-md-4">
+                                            <h6>HIGHLIGHTS</h6>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="NewIn"
+                                                asp-route-audience="Girls">New In</a>
+                                            <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                asp-route-audience="Girls" asp-route-q="Best Sellers">Best Sellers</a>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>CLOTHING</h6>
+                                            @if (pick(girlsCats, "Tops") is Category g1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Girls" asp-route-categoryId="@g1.Id">Tops</a>
+                                            }
+                                            @if (pick(girlsCats, "Dresses") is Category g2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Girls" asp-route-categoryId="@g2.Id">Dresses</a>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <h6>BOTTOMS</h6>
+                                            @if (pick(girlsCats, "Jeans") is Category gb1)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Girls" asp-route-categoryId="@gb1.Id">Jeans</a>
+                                            }
+                                            @if (pick(girlsCats, "Skirts") is Category gb2)
+                                            {
+                                                <a class="mega-link" asp-controller="Catalog" asp-action="Index"
+                                                    asp-route-audience="Girls" asp-route-categoryId="@gb2.Id">Skirts</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: profile + cart -->
+                    <div class="d-flex align-items-center gap-2 ms-lg-3">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="dropdown">
+                                <button
+                                    class="btn btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-2"
+                                    type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.375rem 0.75rem;">
+                                    <i class="bi bi-person-circle fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                                    aria-labelledby="profileDropdown"
+                                    style="border-radius: var(--radius-lg); min-width: 200px; padding: 0.5rem;">
+
+                                    @* Header *@
+                                    <li>
+                                        <h6 class="dropdown-header text-uppercase small fw-bold text-muted">Account</h6>
+                                    </li>
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2"
+                                                asp-controller="Admin" asp-action="Index">
+                                                <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2"
+                                            asp-area="Identity" asp-page="/Account/Manage/Index">
+                                            <i class="bi bi-person-gear"></i> My Profile
+                                        </a>
+                                    </li>
+
+                                    @* Placeholders for future backend features *@
+                                    <li>
+                                        <!-- ⚠️ BACKEND REQUIRED: Order History logic -->
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-muted"
+                                            href="#" onclick="return false;" title="Feature coming soon">
+                                            <i class="bi bi-box-seam"></i> My Orders <small
+                                                class="ms-auto badge bg-light text-dark">Soon</small>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <!-- ⚠️ BACKEND REQUIRED: Wishlist logic -->
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-muted"
+                                            href="#" onclick="return false;" title="Feature coming soon">
+                                            <i class="bi bi-heart"></i> Wishlist <small
+                                                class="ms-auto badge bg-light text-dark">Soon</small>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider my-2">
+                                    </li>
+
+                                    <li>
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"
+                                            asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                                            method="post">
+                                            <button type="submit"
+                                                class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-danger">
+                                                <i class="bi bi-box-arrow-right"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-secondary d-inline-flex align-items-center" asp-area="Identity"
+                                asp-page="/Account/Login" aria-label="Login or Register">
+                                <i class="bi bi-person-circle fs-5"></i>
+                            </a>
+                        }
+                        <a class="btn btn-outline-secondary position-relative" asp-controller="Cart" asp-action="Index"
+                            aria-label="Cart">
+                            <i class="bi bi-bag fs-5"></i>
+                            <span id="cart-count"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @((ViewBag.CartCount ?? 0))
+                            </span>
+                        </a>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @{
+        var isFluid = (ViewData["Fluid"] as bool?) == true;
+        var containerClass = isFluid ? "container-fluid" : "container";
+        var extraPadX = isFluid ? "px-0" : "";
+        var extraPadB = (ViewData["NoPadding"] as bool? == true) ? "pb-0" : (isFluid ? "pb-3" : "pb-5");
+    }
+    <main role="main" class="flex-grow-1 @(isFluid ? "admin-fluid" : "")">
+        <div class="@containerClass @extraPadX @extraPadB">
+            @RenderBody()
+        </div>
+    </main>
+
+    @if (!(ViewData["HideFooter"] as bool? == true))
+    {
+        <footer class="bw-footer @((ViewData["NoPadding"] as bool? == true) ? "" : "mt-5")"
+            style="@((ViewData["NoPadding"] as bool? == true) ? "border-top:0;" : "")">
+            <div class="container py-5">
+                <div class="row g-4 align-items-start">
+                    <!-- Brand / mission -->
+                    <div class="col-12 col-lg-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-bag-check fs-3"></i>
+                            <strong class="fs-5">StreetFlux</strong>
+                        </div>
+                        <p class="mb-3 text-muted">
+                            Monochrome styles. Clean lines. Everyday essentials.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a class="bw-social" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a class="bw-social" href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                            <a class="bw-social" href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                            <a class="bw-social" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Quick links -->
+                    <div class="col-6 col-lg-4">
+                        <div class="fw-semibold text-uppercase small text-muted mb-2">Explore</div>
+                        <ul class="list-unstyled bw-links">
+                            <li><a asp-controller="Catalog" asp-action="Index" asp-route-audience="Men">Men</a></li>
+                            <li><a asp-controller="Catalog" asp-action="Index" asp-route-audience="Women">Women</a></li>
+                            <li><a asp-controller="Catalog" asp-action="Index" asp-route-audience="Boys">Boys</a></li>
+                            <li><a asp-controller="Catalog" asp-action="Index" asp-route-audience="Girls">Girls</a></li>
+                            <li><a asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="col-6 col-lg-4">
+                        <div class="fw-semibold text-uppercase small text-muted mb-2">Newsletter</div>
+                        <p class="text-muted small mb-2">Get drops & deals. No noise.</p>
+                        <form class="bw-news" method="post" action="#">
+                            <input class="form-control form-control-sm" type="email" placeholder="Your email"
+                                aria-label="Email" />
+                            <button class="bw-btn bw-btn-inline" type="submit">Join</button>
+                        </form>
+                        <div class="small text-muted mt-2">We respect your inbox.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bw-footer-bar">
+                <div class="container d-flex flex-wrap gap-2 justify-content-between align-items-center py-3">
+                    <div class="small text-muted">
+                        © @DateTime.UtcNow.Year StreetFlux · Crafted in black & white
+                    </div>
+                    <div class="d-flex gap-3 small">
+                        <a class="bw-link-underline" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="bw-link-underline" asp-controller="Home" asp-action="Terms">Terms</a>
+                        <a class="bw-link-underline" asp-controller="Home" asp-action="Support">Support</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+    <!-- Modern UI Scripts -->
+    <script src="~/js/scroll-animations.js" asp-append-version="true"></script>
+    <script src="~/js/micro-interactions.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await Html.PartialAsync("_CartToastAndSignalR")
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @* Inject the Cart Toast and SignalR logic on every page that uses this layout *@
+
+
+    <script>
+        (function () {
+            const tabs = document.querySelectorAll('.bw-mega-tabs .nav-link');
+            const panel = document.querySelector('.bw-mega-panels');
+            if (!tabs.length || !panel) return;
+
+            const showPanel = () => panel.classList.add('show');
+            const hidePanel = () => panel.classList.remove('show');
+
+            tabs.forEach(t => {
+                t.addEventListener('shown.bs.tab', showPanel);
+                t.addEventListener('click', showPanel);
+            });
+
+            panel.addEventListener('mouseleave', hidePanel);
+            document.addEventListener('click', (e) => {
+                const inMega = e.target.closest('.bw-mega-panels') || e.target.closest('.bw-mega-tabs');
+                if (!inMega) hidePanel();
+            });
+        })();
+    </script>
+
+
+    @* <script> *@
+    @* // Load initial cart count on page load *@
+    @* $(document).ready(function() { *@
+    @* console.log("🛒 Loading initial cart count..."); *@
+
+    @* $.get('/cart/getcount') *@
+    @* .done(function(count) { *@
+    @* console.log("✅ Initial cart count loaded:", count); *@
+    @* // Update the cart badge *@
+    @* const cartBadge = document.getElementById('cart-count'); *@
+    @* if (cartBadge) { *@
+    @* cartBadge.textContent = count; *@
+    @* } *@
+    @* }) *@
+    @* .fail(function(xhr, status, error) { *@
+    @* console.log("⚠️ Could not load initial cart count:", error); *@
+    @* }); *@
+    @* }); *@
+    @* </script> *@
+
+    @* <script src="~/lib/signalr.min.js"></script> *@
+    @* <script> *@
+    @* // Initialize only once *@
+    @* if (!window.cartHub) { *@
+    @* console.log("🛒 Initializing Cart Hub..."); *@
+
+    @* window.cartHub = { *@
+    @* connection: null, *@
+    @* connectionId: null, *@
+
+    @* init: function() { *@
+    @* if (!window.signalR) { *@
+    @* console.warn("SignalR not available"); *@
+    @* return; *@
+    @* } *@
+
+    @* // Create connection *@
+    @* this.connection = new signalR.HubConnectionBuilder() *@
+    @* .withUrl("/hubs/cart") *@
+    @* .withAutomaticReconnect() *@
+    @* .build(); *@
+
+    @* this.setupHandlers(); *@
+    @* this.start(); *@
+    @* this.setupFormInterception(); // Add form interception *@
+    @* }, *@
+
+    @* setupHandlers: function() { *@
+    @* // Cart update handler *@
+    @* this.connection.on("ItemAddedToCart", (payload) => { *@
+    @* console.log("🎯 ItemAddedToCart received:", payload); *@
+    @* this.showToast(payload); *@
+    @* }); *@
+
+    @* // Connection events *@
+    @* this.connection.onreconnecting(() => { *@
+    @* console.log("🔄 CartHub reconnecting..."); *@
+    @* this.connectionId = null; *@
+    @* }); *@
+
+    @* this.connection.onreconnected((id) => { *@
+    @* console.log("✅ CartHub reconnected:", id); *@
+    @* this.connectionId = id; *@
+    @* this.updateForms(); *@
+    @* }); *@
+    @* }, *@
+
+    @* start: function() { *@
+    @* this.connection.start() *@
+    @* .then(() => { *@
+    @* this.connectionId = this.connection.connectionId; *@
+    @* console.log("✅ CartHub connected:", this.connectionId); *@
+    @* this.updateForms(); *@
+    @* }) *@
+    @* .catch(err => console.error("❌ CartHub failed:", err)); *@
+    @* }, *@
+
+    @* updateForms: function() { *@
+    @* const forms = document.querySelectorAll('.add-to-cart-form'); *@
+    @* console.log(`Updating ${forms.length} forms with ID: ${this.connectionId}`); *@
+
+    @* forms.forEach(form => { *@
+    @* let input = form.querySelector('input[name="connectionId"]'); *@
+    @* if (!input) { *@
+    @* input = document.createElement('input'); *@
+    @* input.type = 'hidden'; *@
+    @* input.name = 'connectionId'; *@
+    @* form.appendChild(input); *@
+    @* } *@
+    @* input.value = this.connectionId; *@
+    @* }); *@
+    @* }, *@
+
+    @* // NEW: Intercept form submissions to use AJAX *@
+    @* setupFormInterception: function() { *@
+    @* document.querySelectorAll('.add-to-cart-form').forEach(form => { *@
+    @* form.addEventListener('submit', async (e) => { *@
+    @* e.preventDefault(); // Prevent default form submission *@
+    @* await this.submitForm(form); *@
+    @* }); *@
+    @* }); *@
+    @* }, *@
+
+    @* // NEW: Submit form via AJAX *@
+    @* submitForm: async function(form) { *@
+    @* // Ensure connectionId is current *@
+    @* this.updateFormConnectionId(form); *@
+
+    @* const formData = new FormData(form); *@
+    @* const submitButton = form.querySelector('button[type="submit"]'); *@
+    @* const originalText = submitButton.textContent; *@
+
+    @* try { *@
+    @* // Show loading state *@
+    @* submitButton.disabled = true; *@
+    @* submitButton.textContent = 'Adding...'; *@
+
+    @* const response = await fetch(form.action, { *@
+    @* method: 'POST', *@
+    @* body: formData, *@
+    @* headers: { *@
+    @* 'RequestVerificationToken': form.querySelector('input[name="__RequestVerificationToken"]').value *@
+    @* } *@
+    @* }); *@
+
+    @* if (response.ok) { *@
+    @* const result = await response.json(); *@
+    @* console.log('✅ Item added to cart via AJAX:', result); *@
+    @* // The toast will be shown via SignalR message *@
+    @* } else { *@
+    @* console.error('❌ Failed to add item to cart'); *@
+    @* alert('Failed to add item to cart. Please try again.'); *@
+    @* } *@
+    @* } catch (error) { *@
+    @* console.error('❌ Error adding item to cart:', error); *@
+    @* alert('Error adding item to cart. Please try again.'); *@
+    @* } finally { *@
+    @* // Restore button state *@
+    @* submitButton.disabled = false; *@
+    @* submitButton.textContent = originalText; *@
+    @* } *@
+    @* }, *@
+
+    @* updateFormConnectionId: function(form) { *@
+    @* let input = form.querySelector('input[name="connectionId"]'); *@
+    @* if (!input) { *@
+    @* input = document.createElement('input'); *@
+    @* input.type = 'hidden'; *@
+    @* input.name = 'connectionId'; *@
+    @* form.appendChild(input); *@
+    @* } *@
+    @* input.value = this.connectionId; *@
+    @* }, *@
+
+    @* showToast: function(payload) { *@
+    @* if (typeof showCartToast === 'function') { *@
+    @* showCartToast(payload.name, payload.quantity, payload.totalQuantity); *@
+    @* } else { *@
+    @* this.fallbackToast(payload); *@
+    @* } *@
+    @* }, *@
+
+    @* fallbackToast: function(payload) { *@
+    @* const toast = document.createElement('div'); *@
+    @* toast.innerHTML = ` *@
+    @* <div class="position-fixed top-0 end-0 p-3" style="z-index: 1060"> *@
+    @* <div class="alert alert-success alert-dismissible fade show"> *@
+    @* <strong>Added to Cart!</strong><br> *@
+    @* ${payload.quantity} × ${payload.name}<br> *@
+    @* <small>Total: ${payload.totalQuantity} items</small> *@
+    @* <button type="button" class="btn-close" data-bs-dismiss="alert"></button> *@
+    @* </div> *@
+    @* </div> *@
+    @* `; *@
+    @* document.body.appendChild(toast); *@
+
+    @* setTimeout(() => { *@
+    @* toast.remove(); *@
+    @* }, 4000); *@
+    @* } *@
+    @* }; *@
+
+    @* // Start when ready *@
+    @* if (document.readyState === 'loading') { *@
+    @* document.addEventListener('DOMContentLoaded', () => window.cartHub.init()); *@
+    @* } else { *@
+    @* window.cartHub.init(); *@
+    @* } *@
+    @* } else { *@
+    @* console.log("🛒 CartHub already initialized"); *@
+    @* } *@
+    @* </script> *@
+
+
+
+    @* <script> *@
+    @* (async function(){ *@
+    @* if (!window.signalR) { console.warn("SignalR not loaded"); return; } *@
+
+    @* const conn = new signalR.HubConnectionBuilder() *@
+    @* .withUrl("/hubs/cart") // match your MapHub route *@
+    @* .withAutomaticReconnect() *@
+    @* .build(); *@
+
+    @* // avoid duplicate handlers if script runs twice *@
+    @* conn.off("ItemAddedToCart"); *@
+    @* conn.on("ItemAddedToCart", e => console.log("ItemAddedToCart:", e)); *@
+
+    @* conn.onreconnecting(err => console.log("reconnecting", err)); *@
+    @* conn.onreconnected(id => console.log("reconnected", id)); *@
+    @* conn.onclose(err => console.log("closed", err)); *@
+
+    @* await conn.start(); *@
+    @* console.log("Connected:", conn.connectionId, "state:", conn.state); *@
+    @* })(); *@
+    @* </script> *@
+
+
+
+</body>
+
+</html>

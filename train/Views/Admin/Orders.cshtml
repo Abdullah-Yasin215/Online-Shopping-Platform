@@ -1,0 +1,103 @@
+﻿@model train.ViewModels.AdminOrdersIndexVM
+@{
+    ViewData["Title"] = "All Orders";
+    var current = Model.Status ?? "";
+    var statuses = new[] { "Pending", "Paid", "Shipped", "Cancelled" };
+}
+
+<h2 class="mb-3">All Orders</h2>
+
+<form method="get" class="d-flex gap-2 mb-3">
+    <input name="q" value="@Model.Q" class="form-control" placeholder="Search Order #">
+
+    <select name="status" class="form-select" style="max-width:200px">
+        @if (string.IsNullOrEmpty(current))
+        {
+            <option value="" selected>All statuses</option>
+        }
+        else
+        {
+            <option value="">All statuses</option>
+        }
+
+        @foreach (var s in statuses)
+        {
+            if (current == s)
+            {
+                <option value="@s" selected>@s</option>
+            }
+            else
+            {
+                <option value="@s">@s</option>
+            }
+        }
+    </select>
+
+    <button class="btn btn-primary">Filter</button>
+</form>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Customer</th> <!-- NEW -->
+                <th>Items</th>
+                <th class="text-end">Total</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model.Orders)
+            {
+                var itemCount = o.Items?.Sum(i => i.Quantity) ?? 0;
+                var email = o.User?.Email ?? o.ContactEmail ?? "—";
+                <tr>
+                    <td>@o.Id</td>
+                    <td>@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@email</td> <!-- NEW -->
+                    <td>@itemCount</td>
+                    <td class="text-end">@o.TotalAmount.ToString("C")</td>
+                    <td><span class="badge bg-secondary">@o.Status</span></td>
+                    <td class="text-end">
+                        <a asp-action="OrderDetails" asp-route-id="@o.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(Model.Page==1?"disabled":"")">
+                <a class="page-link"
+                   asp-action="Orders"
+                   asp-route-page="@(Model.Page-1)"
+                   asp-route-status="@Model.Status"
+                   asp-route-q="@Model.Q">Prev</a>
+            </li>
+            @for (var p = 1; p <= Model.TotalPages; p++)
+            {
+                <li class="page-item @(Model.Page==p?"active":"")">
+                    <a class="page-link"
+                       asp-action="Orders"
+                       asp-route-page="@p"
+                       asp-route-status="@Model.Status"
+                       asp-route-q="@Model.Q">@p</a>
+                </li>
+            }
+            <li class="page-item @(Model.Page==Model.TotalPages?"disabled":"")">
+                <a class="page-link"
+                   asp-action="Orders"
+                   asp-route-page="@(Model.Page+1)"
+                   asp-route-status="@Model.Status"
+                   asp-route-q="@Model.Q">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

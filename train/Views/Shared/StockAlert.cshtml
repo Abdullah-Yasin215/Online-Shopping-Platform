@@ -1,0 +1,314 @@
+﻿@section Scripts{
+    <script src="~/lib/signalr.min.js"></script>
+    <script>
+        // Debug function
+        function debugLog(message, data = null) {
+            console.log(`🔧 [StreetFlux Debug] ${message}`, data || '');
+        }
+
+        // Simple localStorage wrapper with error handling
+        const storage = {
+            set: function(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (e) {
+                    debugLog('Storage set failed', e);
+                    return false;
+                }
+            },
+            get: function(key) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch (e) {
+                    debugLog('Storage get failed', e);
+                    return null;
+                }
+            }
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('Page loaded - initializing dashboard');
+
+            // Load any persisted orders
+            const persistedOrders = storage.get('streetflux_orders');
+            debugLog('Persisted orders found:', persistedOrders);
+
+            if (persistedOrders && persistedOrders.length > 0) {
+                updateOrdersTable(persistedOrders);
+                updateOrderCounts(persistedOrders);
+            }
+
+            // Load and display persisted low stock alerts
+            loadPersistedLowStockAlerts();
+
+            // Start SignalR connections
+            initializeSignalR();
+        });
+
+        // Load and display low stock alerts from storage
+        function loadPersistedLowStockAlerts() {
+            const lowStockAlerts = storage.get('streetflux_low_stock_alerts') || [];
+            debugLog('Loading persisted low stock alerts:', lowStockAlerts);
+
+            if (lowStockAlerts.length > 0) {
+                updateLowStockAlertsContainer(lowStockAlerts);
+            }
+        }
+
+        // Update low stock alerts container with all alerts
+        function updateLowStockAlertsContainer(alerts) {
+            const alertsContainer = document.getElementById('low-stock-alerts');
+            if (!alertsContainer) {
+                debugLog('Low stock alerts container not found');
+                return;
+            }
+
+            if (alerts.length === 0) {
+                alertsContainer.innerHTML = '<div class="text-muted">Live alerts will appear here.</div>';
+                return;
+            }
+
+            // Sort by stock quantity (lowest first)
+            alerts.sort((a, b) => a.stock - b.stock);
+
+            alertsContainer.innerHTML = alerts.map(alert => `
+                <div class="bw-list-item low-stock-item" data-product-id="${alert.productId}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${alert.name}</strong>
+                            <div class="text-warning fw-bold">Stock: ${alert.stock}</div>
+                            <small class="text-muted">ID: ${alert.productId}</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">${formatTime(alert.timestamp)}</small>
+                            <div class="mt-1">
+                                <a href="/admin/products/edit/${alert.productId}" class="btn btn-sm btn-outline-warning">Restock</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Format timestamp to relative time
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Save low stock alert to storage
+        function saveLowStockAlert(product) {
+            const alerts = storage.get('streetflux_low_stock_alerts') || [];
+
+            // Check if alert already exists for this product
+            const existingIndex = alerts.findIndex(alert => alert.productId === product.productId);
+
+            if (existingIndex >= 0) {
+                // Update existing alert
+                alerts[existingIndex] = {
+                    ...alerts[existingIndex],
+                    stock: product.stock,
+                    timestamp: product.timestamp || new Date().toISOString()
+                };
+            } else {
+                // Add new alert
+                alerts.push({
+                    productId: product.productId,
+                    name: product.name,
+                    stock: product.stock,
+                    timestamp: product.timestamp || new Date().toISOString()
+                });
+            }
+
+            // Save to storage
+            storage.set('streetflux_low_stock_alerts', alerts);
+
+            // Update UI
+            updateLowStockAlertsContainer(alerts);
+
+            debugLog('Low stock alert saved', product);
+        }
+
+        // Remove low stock alert when stock is restored
+        function removeLowStockAlert(productId) {
+            const alerts = storage.get('streetflux_low_stock_alerts') || [];
+            const filteredAlerts = alerts.filter(alert => alert.productId !== productId);
+
+            storage.set('streetflux_low_stock_alerts', filteredAlerts);
+            updateLowStockAlertsContainer(filteredAlerts);
+
+            debugLog('Low stock alert removed for product', productId);
+        }
+
+        // Check if stock is restored above threshold
+        function checkStockRestored(product) {
+            if (product.stock > 20) {
+                removeLowStockAlert(product.productId);
+                showStockRestoredNotification(product);
+                return true;
+            }
+            return false;
+        }
+
+        // Show notification when stock is restored
+        function showStockRestoredNotification(product) {
+            const notification = document.createElement('div');
+            notification.className = 'order-notification';
+            notification.style.background = '#28a745';
+            notification.style.borderLeftColor = '#218838';
+
+            notification.innerHTML = `
+                <strong>✅ Stock Restored</strong><br>
+                <small>${product.name} - Now ${product.stock} in stock</small>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Show stock alert toast and save to list
+        function showStockAlert(product) {
+            debugLog('Low stock alert received', product);
+
+            // First check if stock is actually restored above threshold
+            if (checkStockRestored(product)) {
+                return; // Don't show alert if stock is restored
+            }
+
+            // Show toast notification
+            const notification = document.createElement('div');
+            notification.className = 'order-notification stock-alert pulse';
+            notification.style.background = '#fd7e14';
+            notification.style.borderLeftColor = '#e55a00';
+
+            notification.innerHTML = `
+                <strong>📦 Low Stock Alert!</strong><br>
+                <small>${product.name} - Only ${product.stock} left in stock</small>
+                <div class="mt-1">
+                    <small>Product ID: ${product.productId}</small>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Save to persistent storage
+            saveLowStockAlert(product);
+
+            // Remove toast after 6 seconds
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 6000);
+        }
+
+        // Update low stock alerts in the compartment
+        function updateLowStockAlerts(product) {
+            // This function is now handled by saveLowStockAlert and updateLowStockAlertsContainer
+            debugLog('Updating low stock alerts for product:', product);
+        }
+
+        // ... REST OF YOUR EXISTING FUNCTIONS (updateOrdersTable, createOrdersTable, updateOrderCounts, handleNewOrder, showOrderNotification, initializeSignalR, showConnectionError) ...
+
+        // Initialize SignalR connections
+        function initializeSignalR() {
+            try {
+                debugLog('Attempting to connect to SignalR hubs');
+
+                // Orders Hub
+                const ordersConn = new signalR.HubConnectionBuilder()
+                    .withUrl("/hubs/admin")
+                    .withAutomaticReconnect()
+                    .build();
+
+                ordersConn.on("OrderCreated", (order) => {
+                    debugLog('SignalR: OrderCreated received', order);
+                    handleNewOrder(order);
+                });
+
+                ordersConn.start()
+                    .then(() => {
+                        debugLog('✅ SignalR Orders Hub Connected');
+                    })
+                    .catch(err => {
+                        debugLog('❌ SignalR Orders Hub failed', err);
+                        showConnectionError();
+                    });
+
+                // Stock Hub
+                const stockConn = new signalR.HubConnectionBuilder()
+                    .withUrl("/hubs/stock")
+                    .withAutomaticReconnect()
+                    .build();
+
+                stockConn.on("LowStockAlert", (product) => {
+                    debugLog('SignalR: LowStockAlert received', product);
+                    showStockAlert(product);
+                });
+
+                // Add handler for stock restored events
+                stockConn.on("StockRestored", (product) => {
+                    debugLog('SignalR: StockRestored received', product);
+                    removeLowStockAlert(product.productId);
+                    showStockRestoredNotification(product);
+                });
+
+                stockConn.start()
+                    .then(() => debugLog('✅ SignalR Stock Hub Connected'))
+                    .catch(err => debugLog('❌ SignalR Stock Hub failed', err));
+
+            } catch (error) {
+                debugLog('SignalR initialization error', error);
+            }
+        }
+
+        // Show connection error notification
+        function showConnectionError() {
+            const notification = document.createElement('div');
+            notification.className = 'order-notification';
+            notification.style.background = '#dc3545';
+            notification.style.borderLeftColor = '#c82333';
+
+            notification.innerHTML = `
+                <strong>⚠️ Connection Issue</strong><br>
+                <small>Real-time updates disabled</small>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+    </script>
+
+ }
